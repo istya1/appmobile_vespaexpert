@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,214 +7,335 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
-  Linking,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import DashboardHeader from '../components/header';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type RootStackParamList = {
-  Dashboard: undefined;
   VespaPedia: undefined;
-  VespaSmart: undefined;
-  Riwayat: undefined;
-  HubungiKami: undefined; // ini boleh tetap ada, tapi tidak dipakai lagi di sini
   Bengkel: undefined;
-  VespaCare: undefined;
+  Profil: undefined;
+  Notifikasi: undefined;
 };
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
-
 const { width } = Dimensions.get('window');
+
+const vespaData = [
+  {
+    name: 'Vespa Sprint 150',
+    desc: 'Sporty & Modern',
+    image: require('../../assets/sprint150.png'),
+  },
+  {
+    name: 'Vespa LX 125',
+    desc: 'Simple & Stylish',
+    image: require('../../assets/LX125.png'),
+  },
+  {
+    name: 'Vespa Primavera',
+    desc: 'Classic & Elegant',
+    image: require('../../assets/primaveras.png'),
+  },
+];
 
 const DashboardScreen = () => {
   const navigation = useNavigation<NavProp>();
+  const [user, setUser] = useState<any>(null);
 
-  // Fungsi buka WhatsApp langsung
-  const openWhatsApp = () => {
-    const phone = '6281217097512'; 
-    const message = 'Halo Admin Vespa Smart Madiun, Izin Bertanya🙏';
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    
-    Linking.canOpenURL(url)
-      .then(supported => {
-        if (supported) {
-          return Linking.openURL(url);
-        } else {
-          console.log("Tidak bisa membuka WhatsApp");
-          // Optional: tampilkan alert kalau WA tidak terinstall
-        }
-      })
-      .catch(err => console.error('Error membuka WhatsApp:', err));
+  // Load user pertama kali
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  // Reload user setiap kali screen di-focus (pindah dari tab lain)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUser();
+    }, [])
+  );
+
+  const loadUser = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <DashboardHeader />
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Banner Bengkel */}
-        <TouchableOpacity
-          style={styles.banner}
-          onPress={() => navigation.navigate('Bengkel')}
-        >
-          <Text style={styles.bannerText}>
-            Bengkel Resmi Vespa
-          </Text>
-        </TouchableOpacity>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
-        {/* Hero Image */}
-        <Image
-          source={require('../../assets/vespaada3.png')}
-          style={styles.hero}
-          resizeMode="contain"
-        />
-
-        {/* Vespa Pedia */}
-        <TouchableOpacity
-          style={styles.cardPrimary}
-          onPress={() => navigation.navigate('VespaPedia')}
-          activeOpacity={0.85}
-        >
-          <Image
-            source={require('../../assets/pedia.png')}
-            style={styles.primaryIcon}
-          />
+        {/* HEADER */}
+        <View style={styles.header}>
           <View>
-            <Text style={styles.primaryTitle}>Vespa Pedia</Text>
-            <Text style={styles.primaryDesc}>
-              Info mesin, tipe & keunggulan
+            <Text style={styles.title}>VESPA EXPERT</Text>
+            <Text style={styles.subtitle}>Aplikasi Vespa Matic</Text>
+          </View>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
+            <MaterialCommunityIcons name="bell-outline" size={24} color="#D4AF37" />
+          </TouchableOpacity>
+        </View>
+
+        {/* PROFILE */}
+        <TouchableOpacity
+          style={styles.profileCard}
+          onPress={() => navigation.navigate('Profil')}
+        >
+          {user?.foto ? (
+            <Image 
+              source={{ uri: user.foto }} 
+              style={styles.profileImage}
+            />
+          ) : (
+            <MaterialCommunityIcons name="account-circle" size={42} color="#D4AF37" />
+          )}
+          <View style={{ marginLeft: 12, flex: 1 }}>
+            <Text style={styles.profileName}>
+              {user?.nama?.toUpperCase() || 'PENGGUNA'}
+            </Text>
+            <Text style={styles.profileDesc}>
+              {user?.jenis_montor || 'Belum memilih motor'}
             </Text>
           </View>
         </TouchableOpacity>
 
-        {/* Grid Menu */}
-        <View style={styles.grid}>
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate('VespaSmart')}
-          >
-            <Image
-              source={require('../../assets/smart.png')}
-              style={styles.cardIcon}
-            />
-            <Text style={styles.cardTitle}>Vespa Smart</Text>
-            <Text style={styles.cardDesc}>Diagnosa Kerusakan</Text>
-          </TouchableOpacity>
+        {/* 3 VESPA IMAGE */}
+        <Image
+          source={require('../../assets/vespa3.png')}
+          style={styles.heroImage}
+          resizeMode="contain"
+        />
 
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate('Riwayat')}
-          >
-            <Image
-              source={require('../../assets/riwayat.png')}
-              style={styles.cardIcon}
-            />
-            <Text style={styles.cardTitle}>Riwayat</Text>
-            <Text style={styles.cardDesc}>Service & Diagnosa</Text>
+        {/* KOLEKSI */}
+        <View style={styles.sectionRow}>
+          <Text style={styles.sectionTitle}>Koleksi Vespa Matic</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('VespaPedia')}>
+            <Text style={styles.seeAll}>lihat semua</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
 
-      {/* Floating WA - Langsung buka WhatsApp */}
-      <TouchableOpacity style={styles.fab} onPress={openWhatsApp}>
-        <Text style={styles.fabText}>Hubungi Kami</Text>
-      </TouchableOpacity>
+        {/* HORIZONTAL SCROLL */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingLeft: 20 }}
+        >
+          {vespaData.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.koleksiCard}
+              onPress={() => navigation.navigate('VespaPedia')}
+              activeOpacity={0.85}
+            >
+              <Image source={item.image} style={styles.koleksiImage} />
+              <View style={styles.overlay} />
+              <View style={styles.koleksiTextContainer}>
+                <Text style={styles.koleksiTitle}>{item.name}</Text>
+                <Text style={styles.koleksiSubtitle}>{item.desc}</Text>
+              </View>
+
+              {/* <View style={styles.badge}>
+                <Text style={styles.badgeText}>2022</Text>
+              </View> */}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* BENGKEL */}
+        <TouchableOpacity
+          style={styles.bengkelCard}
+          onPress={() => navigation.navigate('Bengkel')}
+        >
+          <Text style={styles.bengkelHeader}>Bengkel Resmi Vespa</Text>
+
+          <View style={styles.row}>
+            <MaterialCommunityIcons name="map-marker" size={18} color="#D4AF37" />
+            <Text style={styles.bengkelText}>
+              Jl. Mayjen Sungkono No.4, Madiun
+            </Text>
+          </View>
+
+          <View style={styles.row}>
+            <MaterialCommunityIcons name="phone" size={18} color="#D4AF37" />
+            <Text style={styles.bengkelText}>081234567890</Text>
+          </View>
+
+          <View style={styles.row}>
+            <MaterialCommunityIcons name="clock-outline" size={18} color="#D4AF37" />
+            <Text style={styles.bengkelText}>
+              Senin - Minggu (08.30 - 19.30)
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+      </ScrollView>
     </View>
   );
 };
 
 export default DashboardScreen;
 
-// Styles tetap sama
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#111111',
   },
-  scroll: {
-    padding: width * 0.05,
-    paddingBottom: 140,
-  },
-  banner: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 999,
-    marginBottom: 20,
-  },
-  bannerText: {
-    color: '#6B7280',
-    fontSize: 16,
-  },
-  hero: {
-    width: '100%',
-    height: width * 0.5,
-    marginBottom: 24,
-  },
-  cardPrimary: {
+
+  row: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 20,
     alignItems: 'center',
-    marginBottom: 20,
-    elevation: 3,
+    marginBottom: 8,
   },
-  primaryIcon: {
-    width: 52,
-    height: 52,
-    marginRight: 16,
-  },
-  primaryTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F2937',
-  },
-  primaryDesc: {
-    color: '#4B5563',
-    marginTop: 2,
-  },
-  grid: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  card: {
-    width: '48%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 20,
     alignItems: 'center',
-    elevation: 3,
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    marginBottom: 20,
   },
-  cardIcon: {
-    width: 60,
-    height: 60,
-    marginBottom: 12,
-  },
-  cardTitle: {
+
+  title: {
+    color: '#FFFFFF',
+    fontSize: 22,
     fontWeight: '700',
-    color: '#1F2937',
   },
-  cardDesc: {
-    fontSize: 13,
-    color: '#4B5563',
-    textAlign: 'center',
+
+  subtitle: {
+    color: '#D4AF37',
+    fontSize: 12,
   },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 32,
-    backgroundColor: '#355F87',
-    paddingHorizontal: 26,
-    paddingVertical: 12,
-    borderRadius: 999,
-    elevation: 6,
+
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2A2A2A',
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 25,
+    marginBottom: 20,
   },
-  fabText: {
+
+  profileImage: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1,
+    borderColor: '#D4AF37',
+  },
+
+  profileName: {
     color: '#FFFFFF',
     fontWeight: '700',
+    fontSize: 14,
+  },
+
+  profileDesc: {
+    color: '#AAAAAA',
+    fontSize: 12,
+    marginTop: 2,
+  },
+
+  heroImage: {
+    width: '100%',
+    height: width * 0.5,
+    marginBottom: 20,
+  },
+
+  sectionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+
+  sectionTitle: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+
+  seeAll: {
+    color: '#D4AF37',
+    fontSize: 12,
+  },
+
+  koleksiCard: {
+    width: width * 0.7,
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginRight: 15,
+  },
+
+  koleksiImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+
+  koleksiTextContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+  },
+
+  koleksiTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+
+  koleksiSubtitle: {
+    color: '#DDDDDD',
+    fontSize: 13,
+  },
+
+  badge: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    backgroundColor: '#D4AF37',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+
+  badgeText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  bengkelCard: {
+    backgroundColor: '#2A2A2A',
+    marginHorizontal: 20,
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 40,
+  },
+
+  bengkelHeader: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+
+  bengkelText: {
+    color: '#CCCCCC',
+    marginLeft: 8,
+    flex: 1,
   },
 });

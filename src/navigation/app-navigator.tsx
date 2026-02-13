@@ -21,6 +21,8 @@ import HubungiKami from '../screens/hubungi-kami';
 import VespaCare from '../screens/vespa-care';
 import BengkelScreen from '../screens/bengkel';
 import DashboardFooter from '../components/footer';
+import NotifikasiScreen from '../screens/notifikasi';
+
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -35,6 +37,8 @@ export type RootStackParamList = {
   HubungiKami: undefined;
   VespaCare: undefined;
   Bengkel: undefined;
+  Notifikasi: undefined;
+
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -53,6 +57,8 @@ const MainStack = () => (
       <Stack.Screen name="VespaCare" component={VespaCare} />
       <Stack.Screen name="Profil" component={ProfileScreen} />
       <Stack.Screen name="Bengkel" component={BengkelScreen} />
+      <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
+
     </Stack.Navigator>
 
     <DashboardFooter />

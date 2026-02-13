@@ -53,8 +53,9 @@ const MAP_HTML = `
 </html>
 `;
 
-// Warna icon biru
-const ICON_COLOR = '#1E40AF';
+// Warna icon abu
+const ICON_COLOR = '#D4AF37';
+
 
 export default function BengkelScreen() {
   return (
@@ -236,99 +237,187 @@ const KontakItem = ({
 );
 
 // Styles (sudah sesuai)
+const GOLD = '#D4AF37';
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#111111' 
+  },
+
   header: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: '#2A2A2A',
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
-  headerContent: { alignItems: 'center' },
-  headerTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
-  ratingContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
-  rating: { color: '#FFD700', fontSize: 18, fontWeight: 'bold' },
-  ulasan: { color: '#E0E0E0', fontSize: 14 },
-  resmi: { color: '#fff', fontSize: 14, marginTop: 4 },
+
+  headerContent: { 
+    alignItems: 'center' 
+  },
+
+  headerTitle: { 
+    color: '#FFFFFF', 
+    fontSize: 22, 
+    fontWeight: '700' 
+  },
+
+  ratingContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginTop: 6 
+  },
+
+  rating: { 
+    color: GOLD, 
+    fontSize: 16, 
+    fontWeight: '700' 
+  },
+
+  ulasan: { 
+    color: '#AAAAAA', 
+    fontSize: 12 
+  },
+
+  resmi: { 
+    color: '#CCCCCC', 
+    fontSize: 12, 
+    marginTop: 4 
+  },
+
   headerButtons: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 16,
-    gap: 20,
+    gap: 15,
   },
+
   buttonPhone: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: GOLD,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    paddingHorizontal: 18,
+    borderRadius: 25,
     alignItems: 'center',
     gap: 8,
   },
+
   buttonMap: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#111111',
+    borderWidth: 1,
+    borderColor: GOLD,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    paddingHorizontal: 18,
+    borderRadius: 25,
     alignItems: 'center',
     gap: 8,
   },
-  buttonText: { fontWeight: '600', color: ICON_COLOR },
+
+  buttonText: { 
+    fontWeight: '600', 
+    color: '#000000' 
+  },
+
   mapContainer: {
-    marginTop: 20,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    marginTop: 25,
+    marginHorizontal: 20,
+    borderRadius: 20,
     overflow: 'hidden',
     height: width * 0.55,
   },
+
   map: {
     width: '100%',
     height: '100%',
   },
+
   section: {
-    backgroundColor: '#fff',
-    margin: 16,
+    backgroundColor: '#2A2A2A',
+    marginHorizontal: 20,
+    marginTop: 20,
     padding: 20,
-    borderRadius: 16,
-    elevation: 2,
+    borderRadius: 20,
   },
+
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1F2937',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
     marginBottom: 12,
   },
+
   sectionText: {
-    color: '#4B5563',
+    color: '#CCCCCC',
     lineHeight: 22,
     marginBottom: 16,
   },
+
   keunggulanContainer: { gap: 16 },
-  keunggulanItem: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+
+  keunggulanItem: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 16 
+  },
+
   keunggulanTextContainer: { flex: 1 },
-  keunggulanTitle: { fontWeight: '600', color: '#1F2937' },
-  keunggulanDetail: { color: '#6B7280', fontSize: 13 },
+
+  keunggulanTitle: { 
+    fontWeight: '600', 
+    color: '#FFFFFF' 
+  },
+
+  keunggulanDetail: { 
+    color: '#AAAAAA', 
+    fontSize: 12 
+  },
+
   layananGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  layananItem: { width: '48%', alignItems: 'center', marginBottom: 16 },
-  layananText: { marginTop: 8, textAlign: 'center', color: '#374151', fontSize: 13 },
+
+  layananItem: { 
+    width: '48%', 
+    alignItems: 'center', 
+    marginBottom: 16 
+  },
+
+  layananText: { 
+    marginTop: 8, 
+    textAlign: 'center', 
+    color: '#CCCCCC', 
+    fontSize: 12 
+  },
+
   galleryImage: {
     width: width * 0.65,
     height: 160,
-    borderRadius: 12,
+    borderRadius: 16,
     marginRight: 12,
   },
+
   kontakItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
     gap: 16,
   },
+
   kontakTextContainer: { flex: 1 },
-  kontakTitle: { fontWeight: '600', color: '#1F2937' },
-  kontakValue: { color: '#4B5563', marginTop: 2 },
+
+  kontakTitle: { 
+    fontWeight: '600', 
+    color: '#FFFFFF' 
+  },
+
+  kontakValue: { 
+    color: '#CCCCCC', 
+    marginTop: 2,
+    fontSize: 12 
+  },
 });

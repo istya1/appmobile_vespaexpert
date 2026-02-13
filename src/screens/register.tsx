@@ -61,7 +61,7 @@ const RegisterScreen = ({ navigation }: any) => {
         jenis_montor: formData.jenisMontor,
       });
       Alert.alert(
-        'Registrasi Berhasil! 🎉',
+        'Registrasi Berhasil!',
         'Akun Anda telah dibuat. Silakan login untuk melanjutkan.',
         [{ text: 'OK', onPress: () => navigation.replace('Login') }]
       );
@@ -89,7 +89,7 @@ const RegisterScreen = ({ navigation }: any) => {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../assets/logonw.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -99,18 +99,24 @@ const RegisterScreen = ({ navigation }: any) => {
         <Text style={styles.subtitle}>Sistem Diagnosa Vespa Matic</Text>
 
         {/* Nama */}
+        <Text style={styles.label}>
+          Nama Lengkap <Text style={styles.required}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
-          placeholder="Nama Lengkap"
+          placeholder="Isi Dengan Nama Lengkap"
           value={formData.nama}
           onChangeText={(text) => setFormData({ ...formData, nama: text })}
           autoCapitalize="words"
         />
 
         {/* Email */}
+        <Text style={styles.label}>
+          Email <Text style={styles.required}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="Isi DenganEmail"
           keyboardType="email-address"
           autoCapitalize="none"
           value={formData.email}
@@ -118,9 +124,12 @@ const RegisterScreen = ({ navigation }: any) => {
         />
 
         {/* No HP */}
+        <Text style={styles.label}>
+          No HP <Text style={styles.required}>*</Text>
+        </Text>
         <TextInput
           style={styles.input}
-          placeholder="No HP (opsional)"
+          placeholder="Isi Dengan No HP"
           keyboardType="phone-pad"
           value={formData.noHp}
           onChangeText={(text) => setFormData({ ...formData, noHp: text })}
@@ -147,10 +156,13 @@ const RegisterScreen = ({ navigation }: any) => {
         </View>
 
         {/* Password */}
+        <Text style={styles.label}>
+          Password <Text style={styles.required}>*</Text>
+        </Text>
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            placeholder="Password"
+            placeholder="Isi Dengan Password"
             secureTextEntry={!showPassword}
             value={formData.password}
             onChangeText={(text) =>
@@ -170,10 +182,13 @@ const RegisterScreen = ({ navigation }: any) => {
         </View>
 
         {/* Konfirmasi Password */}
+        <Text style={styles.label}>
+          Konfirmasi Password <Text style={styles.required}>*</Text>
+        </Text>
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            placeholder="Konfirmasi Password"
+            placeholder="Isi Dengan Konfirmasi Password"
             secureTextEntry={!showConfirmPassword}
             value={formData.confirmPassword}
             onChangeText={(text) =>
@@ -226,116 +241,139 @@ const RegisterScreen = ({ navigation }: any) => {
 
 export default RegisterScreen;
 
+const GOLD = '#D4AF37';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#111111',
   },
+
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingVertical: 20,
   },
+
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 30,
     marginTop: 20,
   },
+
   logo: {
-    width: 208,
-    height: 208,
+    width: 200,
+    height: 200,
   },
+
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
-    color: '#1F2937',
-    marginBottom: 8,
+    color: '#FFFFFF',
+    marginBottom: 6,
   },
+
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
-    color: '#6B7280',
-    marginBottom: 40,
+    color: '#AAAAAA',
+    marginBottom: 30,
   },
+
   input: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    borderColor: '#3A3A3A',
+    backgroundColor: '#2A2A2A',
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
     fontSize: 16,
-    marginBottom: 16,
+    marginBottom: 18,
+    color: '#FFFFFF',
   },
+
   label: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
+    fontWeight: '600',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
+
   required: {
-    color: '#EF4444',
+    color: GOLD,
   },
+
   pickerWrapper: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 16,
-    marginBottom: 16,
+    borderColor: '#3A3A3A',
+    backgroundColor: '#2A2A2A',
+    borderRadius: 20,
+    marginBottom: 20,
     overflow: 'hidden',
   },
+
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 16,
-    marginBottom: 16,
+    borderColor: '#3A3A3A',
+    backgroundColor: '#2A2A2A',
+    borderRadius: 20,
+    marginBottom: 18,
   },
+
   passwordInput: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
     fontSize: 16,
+    color: '#FFFFFF',
   },
+
   eyeButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
   },
+
   button: {
-    borderRadius: 16,
+    borderRadius: 25,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 10,
   },
+
   buttonNormal: {
-    backgroundColor: '#2563EB',
+    backgroundColor: GOLD,
   },
+
   buttonLoading: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: '#B8902F',
   },
+
   buttonText: {
-    color: '#fff',
+    color: '#000000',
     fontSize: 18,
     fontWeight: '700',
   },
+
   loadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   loadingText: {
-    color: '#fff',
+    color: '#000000',
     fontSize: 18,
     fontWeight: '700',
     marginLeft: 12,
   },
+
   loginText: {
     textAlign: 'center',
-    marginTop: 32,
-    color: '#2563EB',
-    fontSize: 16,
-    fontWeight: '500',
+    marginTop: 28,
+    color: GOLD,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

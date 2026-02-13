@@ -6,6 +6,7 @@ import SplashScreen from './src/screens/splash';
 import AppNavigator from './src/navigation/app-navigator';
 import './src/global.css';
 
+
 const RootStack = createNativeStackNavigator();
 
 export default function App() {

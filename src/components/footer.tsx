@@ -6,64 +6,60 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-type RootStackParamList = {
-  Dashboard: undefined;
-  Care: undefined;
-  Diagnosa: undefined;
-  Riwayat: undefined;
-  Profile: undefined;
-};
-
-type NavProp = NativeStackNavigationProp<RootStackParamList>;
-
 const DashboardFooter = () => {
-  const navigation = useNavigation<NavProp>();
+  const navigation = useNavigation<any>();
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+      <View style={styles.goldLine} />
+
       <View style={styles.container}>
-        {/* Home */}
         <TouchableOpacity
           style={styles.item}
-          onPress={() => navigation.navigate('Dashboard')}
+          onPress={() =>
+            navigation.navigate('Main', { screen: 'Dashboard' })
+          }
         >
-          <MaterialCommunityIcons name="home-variant" size={26} color="#FFFFFF" />
+          <MaterialCommunityIcons name="home-variant" size={26} color="#555555" />
         </TouchableOpacity>
 
-        {/* Vespa Care */}
         <TouchableOpacity
           style={styles.item}
-          onPress={() => navigation.navigate('Care')}
+          onPress={() =>
+            navigation.navigate('Main', { screen: 'VespaCare' })
+          }
         >
-          <MaterialCommunityIcons name="wrench-clock" size={26} color="#FFFFFF" />
+          <MaterialCommunityIcons name="wrench-clock" size={26} color="#555555" />
         </TouchableOpacity>
 
-        {/* Diagnosa (Floating) */}
         <TouchableOpacity
           style={styles.centerButton}
-          onPress={() => navigation.navigate('Diagnosa')}
+          onPress={() =>
+            navigation.navigate('Main', { screen: 'VespaSmart' })
+          }
           activeOpacity={0.85}
         >
-          <MaterialCommunityIcons name="tools" size={32} color="#1E40AF" />
+          <MaterialCommunityIcons name="tools" size={30} color="#111111" />
         </TouchableOpacity>
 
-        {/* Riwayat */}
         <TouchableOpacity
           style={styles.item}
-          onPress={() => navigation.navigate('Riwayat')}
+          onPress={() =>
+            navigation.navigate('Main', { screen: 'Riwayat' })
+          }
         >
-          <MaterialCommunityIcons name="history" size={26} color="#FFFFFF" />
+          <MaterialCommunityIcons name="history" size={26} color="#555555" />
         </TouchableOpacity>
 
-        {/* Profile */}
         <TouchableOpacity
           style={styles.item}
-          onPress={() => navigation.navigate('Profile')}
+          onPress={() =>
+            navigation.navigate('Main', { screen: 'Profil' })
+          }
         >
-          <MaterialCommunityIcons name="account-circle" size={26} color="#FFFFFF" />
+          <MaterialCommunityIcons name="account-circle" size={26} color="#555555" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -74,29 +70,31 @@ export default DashboardFooter;
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: '#1E40AF',
+    backgroundColor: "#000000",
   },
-
+  goldLine: {
+    height: 1.5,
+    backgroundColor: '#D4AF37',
+    width: '100%',
+  },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 60,              // 🔥 TIPIS seperti IG
+    height: 65,
     paddingHorizontal: 12,
     justifyContent: 'space-between',
   },
-
   item: {
     flex: 1,
     alignItems: 'center',
   },
-
   centerButton: {
     position: 'relative',
-    top: -20,                // 🔥 NAIK ke atas
+    top: -22,
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#D4AF37',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 10,
