@@ -13,38 +13,32 @@ const SplashScreen = () => {
 
   useEffect(() => {
     StatusBar.setBarStyle('light-content');
-    StatusBar.setBackgroundColor('#0D47A1', true); // Biru tua solid
+    StatusBar.setBackgroundColor('#0F172A', true); // Midnight Blue
   }, []);
 
-  // Auto pindah ke MainApp setelah 4 detik
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('MainApp'); // Sesuaikan nama screen di RootStack
-    }, 4000);
+      navigation.replace('MainApp');
+    }, 3000);
     return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        {/* Logo Vespa Besar dengan Shadow Glowing */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logoShadow}>
-            <Image
-              source={require('../../assets/logo.png')} // Pastikan file & path benar!
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('../../assets/logonw.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
 
-        {/* Teks di Bawah Logo – Keren Abis! */}
-        <View style={styles.textContainer}>
-            <Text style={styles.appTitle}>Vespa Expert</Text>
-          <Text style={styles.subtitle}>
-            Sistem Pakar untuk Vespa Matic
-          </Text>
-        </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.appTitle}>VESPA EXPERT</Text>
+        <View style={styles.goldLine} />
+        <Text style={styles.subtitle}>
+          Smart Diagnosis for Vespa Matic
+        </Text>
       </View>
     </View>
   );
@@ -53,55 +47,43 @@ const SplashScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffff', 
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#0F172A', // navy luxury
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
   },
+
   logoContainer: {
     marginBottom: 40,
   },
-  logoShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 25,
-    elevation: 25,
-  },
+
   logo: {
-    width: 260,
-    height: 260,
+    width: 220,
+    height: 220,
   },
+
   textContainer: {
     alignItems: 'center',
   },
+
   appTitle: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: 'black',
-    letterSpacing: 2,
-    marginBottom: 12,
-   
+    fontSize: 30,
+    fontWeight: '800',
+    letterSpacing: 4,
+    color: '#F8FAFC', // soft white
   },
-  mainTagline: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'grey',
-    textAlign: 'center',
-    lineHeight: 34,
-    marginBottom: 16,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
+
+  goldLine: {
+    width: 80,
+    height: 3,
+    backgroundColor: '#C6A75E', // gold accent
+    marginVertical: 16,
+    borderRadius: 10,
   },
+
   subtitle: {
-    fontSize: 19,
-    color: '#0000',
-    fontWeight: '600',
-    textAlign: 'center',
+    fontSize: 16,
+    color: '#CBD5E1', // elegant gray
+    letterSpacing: 1,
   },
 });
 
