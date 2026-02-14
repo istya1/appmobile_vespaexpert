@@ -23,6 +23,7 @@ import BengkelScreen from '../screens/bengkel';
 import DashboardFooter from '../components/footer';
 import NotifikasiScreen from '../screens/notifikasi';
 import VespaDetail from '../screens/vespa-detail';
+import HasilDiagnosis from '../screens/hasil-diagnosis';
 
 
 export type RootStackParamList = {
@@ -40,6 +41,7 @@ export type RootStackParamList = {
   Bengkel: undefined;
   Notifikasi: undefined;
   VespaDetail: undefined;
+  HasilDiagnosis: { hasil: any };
 
 };
 
@@ -60,7 +62,8 @@ const MainStack = () => (
       <Stack.Screen name="Profil" component={ProfileScreen} />
       <Stack.Screen name="Bengkel" component={BengkelScreen} />
       <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
-       <Stack.Screen name="VespaDetail" component={VespaDetail} />
+      <Stack.Screen name="VespaDetail" component={VespaDetail} />
+      <Stack.Screen name="HasilDiagnosis" component={HasilDiagnosis} />
 
     </Stack.Navigator>
 
