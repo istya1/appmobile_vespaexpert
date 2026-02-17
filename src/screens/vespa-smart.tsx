@@ -1,3 +1,5 @@
+// screens/VespaSmartScreen.tsx
+// screens/VespaSmartScreen.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -7,24 +9,23 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Modal,
+  ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { getVespaSmartData, prosesDiagnosis, simpanRiwayatDiagnosis } from '../services/api';
+import { getVespaSmartData, prosesDiagnosis, AturanKandidat } from '../services/api';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 // ============================================
-// TYPES & INTERFACES
+// TYPES
 // ============================================
 
 type RootStackParamList = {
   VespaSmart: undefined;
-  HasilDiagnosis: { hasil: HasilDiagnosisType };
+  HasilDiagnosis: { hasil: any };
 };
 
-type VespaSmartScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'VespaSmart'
->;
+type VespaSmartScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'VespaSmart'>;
 
 interface Props {
   navigation: VespaSmartScreenNavigationProp;
@@ -38,33 +39,27 @@ interface GejalaItem {
   deskripsi?: string;
 }
 
-interface HasilDiagnosisType {
-  success: boolean;
-  jenis_motor: string;
-  gejala_dipilih: number;
-  hasil_diagnosis: any[];
-  total_kerusakan_ditemukan: number;
-}
-
 // ============================================
 // COMPONENT
 // ============================================
 
 const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
-  const [jenisMotor, setJenisMotor] = useState<string>('');
-  const [gejalaList, setGejalaList] = useState<GejalaItem[]>([]);
-  const [gejalaTerpilih, setGejalaTerpilih] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [jenisMotor, setJenisMotor]                   = useState<string>('');
+  const [gejalaList, setGejalaList]                   = useState<GejalaItem[]>([]);
+  const [gejalaTerpilih, setGejalaTerpilih]           = useState<string[]>([]);
+  const [loading, setLoading]                         = useState<boolean>(false);
+  const [kandidatList, setKandidatList]               = useState<AturanKandidat[]>([]);
+  const [showKonfirmasiModal, setShowKonfirmasiModal] = useState<boolean>(false);
+  const [pendingNavData, setPendingNavData]           = useState<any>(null);
 
   const jenisMotorOptions: string[] = [
     'Sprint 150',
     'Sprint S 150',
     'LX 125',
     'Primavera 150',
-    'Primavera S 150'
+    'Primavera S 150',
   ];
 
-  // Load data ketika jenis motor dipilih
   useEffect(() => {
     if (jenisMotor) {
       loadGejalaData();
@@ -74,112 +69,108 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [jenisMotor]);
 
-  // Fungsi load data gejala
+  // ── LOAD DATA ────────────────────────────────────────────────────────
   const loadGejalaData = async (): Promise<void> => {
     setLoading(true);
     try {
-      console.log('Loading data for:', jenisMotor);
       const data = await getVespaSmartData(jenisMotor);
-      console.log('Response:', data);
-
       if (data.success) {
-        // Convert object to array
         const gejalaArray: GejalaItem[] = [];
         Object.keys(data.gejala_by_kategori).forEach((kategori: string) => {
           data.gejala_by_kategori[kategori].forEach((gejala: any) => {
-            gejalaArray.push({
-              ...gejala,
-              kategori: kategori
-            });
+            gejalaArray.push({ ...gejala, kategori });
           });
         });
-
         setGejalaList(gejalaArray);
         setGejalaTerpilih([]);
       } else {
         Alert.alert('Error', 'Gagal memuat data');
       }
-    } catch (error: unknown) {
-      console.error('Error loading data:', error);
-
-      let errorMessage = 'Terjadi kesalahan';
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as any;
-        errorMessage = axiosError.response?.data?.message || 'Server error';
-      } else if (error && typeof error === 'object' && 'request' in error) {
-        errorMessage = 'Tidak dapat terhubung ke server';
-      }
-
-      Alert.alert('Error', errorMessage);
+    } catch (error: any) {
+      Alert.alert('Error', error.response?.data?.message || 'Terjadi kesalahan');
     } finally {
       setLoading(false);
     }
   };
 
-  // Toggle pilihan gejala
+  // ── TOGGLE GEJALA ────────────────────────────────────────────────────
   const toggleGejala = (kodeGejala: string): void => {
-    if (gejalaTerpilih.includes(kodeGejala)) {
-      setGejalaTerpilih(gejalaTerpilih.filter((k: string) => k !== kodeGejala));
-    } else {
-      setGejalaTerpilih([...gejalaTerpilih, kodeGejala]);
-    }
+    setGejalaTerpilih(prev =>
+      prev.includes(kodeGejala)
+        ? prev.filter(k => k !== kodeGejala)
+        : [...prev, kodeGejala]
+    );
   };
 
-  // Proses diagnosis
+  // ── HANDLE DIAGNOSIS ─────────────────────────────────────────────────
   const handleDiagnosis = async (): Promise<void> => {
+    if (!jenisMotor) {
+      Alert.alert('Error', 'Pilih jenis motor terlebih dahulu.');
+      return;
+    }
     if (gejalaTerpilih.length === 0) {
-      Alert.alert('Peringatan', 'Pilih minimal 1 gejala terlebih dahulu');
+      Alert.alert('Error', 'Pilih minimal satu gejala.');
       return;
     }
 
-    setLoading(true);
     try {
-      console.log('Processing diagnosis...');
-      console.log('Jenis Motor:', jenisMotor);
-      console.log('Gejala Terpilih:', gejalaTerpilih);
+      setLoading(true);
+      const response = await prosesDiagnosis(jenisMotor, gejalaTerpilih);
 
-      const hasil = await prosesDiagnosis(jenisMotor, gejalaTerpilih);
-      console.log('Hasil diagnosis:', hasil);
+      if (!response?.success) {
+        Alert.alert('Error', response?.message || 'Terjadi kesalahan.');
+        return;
+      }
 
-      if (hasil.success) {
-        // Opsional: Simpan ke riwayat
-        try {
-          await simpanRiwayatDiagnosis({
-            jenis_motor: jenisMotor,
-            gejala_terpilih: gejalaTerpilih,
-            hasil_diagnosis: hasil.hasil_diagnosis,
-          });
-          console.log('Riwayat berhasil disimpan');
-        } catch (err) {
-          console.log('Gagal simpan riwayat (tidak masalah):', err);
+      if (response.status_diagnosis === 'selesai') {
+        const adaKemungkinan = response.kemungkinan_kerusakan.length > 0;
+
+        const navData = {
+          jenis_motor:          jenisMotor,
+          gejala_dipilih:       gejalaTerpilih,
+          hasil_diagnosis:      response.hasil_diagnosis,
+          kemungkinan_kerusakan: response.kemungkinan_kerusakan,
+        };
+
+        if (adaKemungkinan) {
+          // Ada kemungkinan → tampilkan modal konfirmasi gejala tambahan
+          setKandidatList(response.kemungkinan_kerusakan);
+          setPendingNavData(navData);
+          setShowKonfirmasiModal(true);
+        } else {
+          // Semua 100%, langsung ke hasil
+          navigation.navigate('HasilDiagnosis', { hasil: navData });
         }
-
-        // Navigate ke hasil
-        navigation.navigate('HasilDiagnosis', { hasil });
-      } else {
-        Alert.alert('Error', 'Diagnosis gagal diproses');
-      }
-    } catch (error: unknown) {
-      console.error('Error diagnosis:', error);
-
-      let errorMessage = 'Gagal melakukan diagnosis';
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as any;
-        errorMessage = axiosError.response?.data?.message || 'Server error';
-      } else if (error && typeof error === 'object' && 'request' in error) {
-        errorMessage = 'Tidak dapat terhubung ke server';
+        return; // ← penting: stop di sini
       }
 
-      Alert.alert('Error', errorMessage);
+      // tidak_ditemukan
+      Alert.alert('Info', response.message);
+
+    } catch (error) {
+      Alert.alert('Error', 'Gagal memproses diagnosis.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Render item gejala
+  // ── MODAL: Lihat Hasil (tanpa diagnosis ulang) ───────────────────────
+  const handleLihatHasil = (): void => {
+    setShowKonfirmasiModal(false);
+    if (pendingNavData) {
+      navigation.navigate('HasilDiagnosis', { hasil: pendingNavData });
+    }
+  };
+
+  // ── MODAL: Diagnosis Ulang (dengan gejala tambahan yg dipilih) ───────
+  const handleDiagnosisUlang = (): void => {
+    setShowKonfirmasiModal(false);
+    handleDiagnosis();
+  };
+
+  // ── RENDER ITEM ──────────────────────────────────────────────────────
   const renderGejalaItem = ({ item }: { item: GejalaItem }) => {
     const isSelected = gejalaTerpilih.includes(item.kode_gejala);
-
     return (
       <TouchableOpacity
         style={[styles.gejalaItem, isSelected && styles.gejalaItemSelected]}
@@ -196,15 +187,17 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
     );
   };
 
+  // ── RENDER ───────────────────────────────────────────────────────────
   return (
     <View style={styles.container}>
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>VESPA SMART</Text>
         <Text style={styles.headerSubtitle}>Smart Diagnosis System</Text>
       </View>
 
-      {/* Pilih Tipe Vespa */}
+      {/* Picker Jenis Motor */}
       <View style={styles.pickerWrapper}>
         <Text style={styles.pickerLabel}>Pilih Tipe Vespa Anda</Text>
         <View style={styles.pickerContainer}>
@@ -257,7 +250,7 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
                 <TouchableOpacity
                   style={[
                     styles.diagnosisButton,
-                    (loading || gejalaTerpilih.length === 0) && styles.buttonDisabled
+                    (loading || gejalaTerpilih.length === 0) && styles.buttonDisabled,
                   ]}
                   onPress={handleDiagnosis}
                   disabled={loading || gejalaTerpilih.length === 0}
@@ -281,9 +274,101 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.emptyText}>Pilih tipe Vespa untuk memulai diagnosis</Text>
         </View>
       )}
+
+      {/* Modal Konfirmasi Gejala Tambahan */}
+      <Modal
+        visible={showKonfirmasiModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowKonfirmasiModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Konfirmasi Gejala Tambahan</Text>
+            <Text style={styles.modalSubtitle}>
+              Apakah Anda mengalami gejala berikut? Centang jika ada, lalu tekan
+              "Diagnosis Ulang". Atau tekan "Lihat Hasil" untuk langsung melihat hasil.
+            </Text>
+
+            <ScrollView style={{ maxHeight: 400 }}>
+              {kandidatList.map((kandidat, idx) => (
+                <View key={idx} style={styles.kandidatCard}>
+
+                  {/* Header kandidat */}
+                  <View style={styles.kandidatHeader}>
+                    <Text style={styles.kandidatNama}>{kandidat.nama_kerusakan}</Text>
+                    <View style={styles.persenBadge}>
+                      <Text style={styles.persenBadgeText}>
+                        {kandidat.kecocokan.persentase}%
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.kandidatProgress}>
+                    {kandidat.kecocokan.sudah_cocok}/{kandidat.kecocokan.total_rule} gejala cocok
+                  </Text>
+
+                  <Text style={styles.konfirmasiLabel}>Apakah ada gejala berikut?</Text>
+
+                  {kandidat.gejala.perlu_dikonfirmasi.map(
+                    (g: AturanKandidat['gejala']['perlu_dikonfirmasi'][number]) => (
+                      <TouchableOpacity
+                        key={g.kode_gejala}
+                        style={[
+                          styles.konfirmasiGejalaItem,
+                          gejalaTerpilih.includes(g.kode_gejala) && styles.konfirmasiGejalaSelected,
+                        ]}
+                        onPress={() => toggleGejala(g.kode_gejala)}
+                      >
+                        <View style={[
+                          styles.checkboxSmall,
+                          gejalaTerpilih.includes(g.kode_gejala) && styles.checkboxSmallSelected,
+                        ]}>
+                          {gejalaTerpilih.includes(g.kode_gejala) && (
+                            <Text style={styles.checkmarkSmall}>✓</Text>
+                          )}
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.konfirmasiGejalaText}>{g.nama_gejala}</Text>
+                          {g.deskripsi && (
+                            <Text style={styles.konfirmasiGejalaDesc}>{g.deskripsi}</Text>
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                    )
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* Tombol modal */}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonNo]}
+                onPress={handleLihatHasil}        // ← langsung ke hasil
+              >
+                <Text style={styles.modalButtonTextDark}>Lihat Hasil</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonYes]}
+                onPress={handleDiagnosisUlang}    // ← hitung ulang + gejala baru
+              >
+                <Text style={styles.modalButtonText}>Diagnosis Ulang</Text>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
+
+// ============================================
+// STYLES
+// ============================================
 
 const styles = StyleSheet.create({
   container: {
@@ -314,21 +399,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
   },
-
   pickerLabel: {
     color: '#999999',
     fontSize: 12,
     marginBottom: 6,
     letterSpacing: 0.5,
   },
-
   pickerContainer: {
     backgroundColor: '#111111',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#2A2A2A',
   },
-
   picker: {
     color: '#FFFFFF',
     height: 50,
@@ -443,13 +525,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 8,
   },
-
   selectedBadgeText: {
     color: '#000000',
     fontWeight: '600',
     fontSize: 11,
   },
-
   selectedText: {
     color: '#999999',
     fontSize: 13,
@@ -460,7 +540,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     shadowOffset: { width: 0, height: 4 },
-
   },
   buttonDisabled: {
     backgroundColor: '#333333',
@@ -489,31 +568,151 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
-  selectedMotorContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+  // ── Modal ────────────────────────────────────────────────────────────
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-
-  selectedMotorLabel: {
-    fontSize: 11,
-    color: '#777777',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
+  modalContainer: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: '#333333',
   },
-
-  selectedMotorText: {
+  modalTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#FFFFFF',
-    marginTop: 4,
+    marginBottom: 8,
+    textAlign: 'center',
   },
-
-  selectedMotorInstruction: {
+  modalSubtitle: {
+    color: '#888888',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalButtonYes: {
+    backgroundColor: '#D4AF37',
+  },
+  modalButtonNo: {
+    backgroundColor: '#555555',
+  },
+  modalButtonText: {
+    color: '#000000',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  modalButtonTextDark: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  // ── Kandidat Card (dalam modal) ──────────────────────────────────────
+  kandidatCard: {
+    backgroundColor: '#111111',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#333333',
+  },
+  kandidatHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  kandidatNama: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 15,
+    flex: 1,
+    marginRight: 8,
+  },
+  persenBadge: {
+    backgroundColor: '#D4AF37',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  persenBadgeText: {
+    color: '#000000',
+    fontWeight: 'bold',
     fontSize: 12,
-    color: '#999999',
-    marginTop: 6,
   },
-
+  kandidatProgress: {
+    color: '#888888',
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  konfirmasiLabel: {
+    color: '#D4AF37',
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  konfirmasiGejalaItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#333333',
+    marginBottom: 6,
+    backgroundColor: '#1A1A1A',
+  },
+  konfirmasiGejalaSelected: {
+    borderColor: '#D4AF37',
+    backgroundColor: '#2A2415',
+  },
+  checkboxSmall: {
+    width: 22,
+    height: 22,
+    borderWidth: 2,
+    borderColor: '#555555',
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    marginTop: 1,
+  },
+  checkboxSmallSelected: {
+    backgroundColor: '#D4AF37',
+    borderColor: '#D4AF37',
+  },
+  checkmarkSmall: {
+    color: '#000',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  konfirmasiGejalaText: {
+    color: '#CCCCCC',
+    fontSize: 14,
+  },
+  konfirmasiGejalaDesc: {
+    color: '#666666',
+    fontSize: 12,
+    marginTop: 2,
+  },
 });
 
 export default VespaSmartScreen;

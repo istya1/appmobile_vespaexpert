@@ -24,6 +24,7 @@ import DashboardFooter from '../components/footer';
 import NotifikasiScreen from '../screens/notifikasi';
 import VespaDetail from '../screens/vespa-detail';
 import HasilDiagnosis from '../screens/hasil-diagnosis';
+import RiwayatDiagnosisScreen from '../screens/riwayat';
 
 
 export type RootStackParamList = {
@@ -42,6 +43,7 @@ export type RootStackParamList = {
   Notifikasi: undefined;
   VespaDetail: undefined;
   HasilDiagnosis: { hasil: any };
+  
 
 };
 

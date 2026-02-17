@@ -1,3 +1,4 @@
+// services/api.ts
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,23 +19,100 @@ interface VespaSmartDataResponse {
   total_aturan: number;
 }
 
-interface DiagnosisResponse {
+export interface GejalaDetail {
+  kode_gejala: string;
+  nama_gejala: string;
+  kategori: string;
+  deskripsi?: string;
+}
+
+export interface HasilDiagnosisFinal {
+  id_aturan: number;
+  kode_kerusakan: string;
+  nama_kerusakan: string;
+  solusi: string;
+  persentase_kecocokan: number;
+  jumlah_gejala: number;
+  status: 'final';
+}
+
+export interface AturanKandidat {
+  id_aturan: number;
+  kode_kerusakan: string;
+  nama_kerusakan: string;
+  kecocokan: {
+    persentase: number;
+    sudah_cocok: number;
+    total_rule: number;
+    sisa_konfirmasi: number;
+  };
+  gejala: {
+    sudah_dipilih: GejalaDetail[];
+    perlu_dikonfirmasi: GejalaDetail[];
+  };
+  status: 'perlu_konfirmasi';
+}
+
+export interface KemungkinanKecil {
+  id_aturan: number;
+  kode_kerusakan: string;
+  nama_kerusakan: string;
+  kecocokan: {
+    persentase: number;
+    sudah_cocok: number;
+    total_rule: number;
+  };
+  status: 'kemungkinan_kecil';
+}
+
+export interface DiagnosisResponse {
   success: boolean;
+  status_diagnosis: 'selesai' | 'tidak_ditemukan';
+  message: string;
+  hasil_diagnosis: HasilDiagnosisFinal[];
+  kemungkinan_kerusakan: AturanKandidat[]; // ← semua partial masuk sini
+
+}
+
+interface DiagnosisResult {
+  id_aturan: number;
+  kode_kerusakan: string;
+  nama_kerusakan: string;
+  solusi: string;
+  persentase_kecocokan: number;
+  gejala_cocok: number;
+  total_gejala_aturan: number;
+  gejala_yang_cocok: string[];
+  semua_gejala_aturan: string[];
+  prioritas: number;
+  tingkat_kepastian: string;
+}
+
+
+interface DiagnosisItem {
+  id_aturan: number;
+  kode_kerusakan: string;
+  nama_kerusakan: string;
+  solusi: string;
+  persentase_kecocokan: number;
+}
+
+interface GejalaItem {
+  kode_gejala: string;
+  nama_gejala: string;
   jenis_motor: string;
-  gejala_dipilih: number;
-  hasil_diagnosis: any[];
-  total_kerusakan_ditemukan: number;
+  kategori: string;
+  deskripsi?: string;
 }
 
 interface RiwayatDiagnosisData {
   jenis_motor: string;
   gejala_terpilih: string[];
-  hasil_diagnosis: any[];
+  hasil_diagnosis: DiagnosisResult[];
 }
 
-// Buat instance axios
 const api: AxiosInstance = axios.create({
-  baseURL: 'http://192.168.1.4:8000/api',
+  baseURL: 'http://192.168.1.2:8000/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -46,7 +124,7 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem('token');
-     console.log("TOKEN:", token); 
+    console.log("TOKEN:", token); 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -75,7 +153,6 @@ api.interceptors.response.use(
   }
 );
 
-// Export default api instance
 export default api;
 
 export const getGejala = async (jenisMotor: string): Promise<any> => {
@@ -101,23 +178,21 @@ export const getVespaSmartData = async (jenisMotor: string): Promise<VespaSmartD
 };
 
 export const prosesDiagnosis = async (
-  jenisMotor: string, 
-  gejalaTerpilih: string[]
+  jenisMotor: string,
+  gejala: string[]
 ): Promise<DiagnosisResponse> => {
-  try {
-    const response = await api.post<DiagnosisResponse>('/mobile/proses-diagnosis', {
-      jenis_motor: jenisMotor,
-      gejala_terpilih: gejalaTerpilih
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await api.post('/mobile/proses-diagnosis', {
+
+    jenis_motor: jenisMotor,
+    gejala,
+  });
+
+  return response.data;
 };
 
 export const simpanRiwayatDiagnosis = async (data: RiwayatDiagnosisData): Promise<any> => {
   try {
-    const response = await api.post('/mobile/diagnosa', data); // ← Ganti dari /diagnosis ke /diagnosa
+    const response = await api.post('/mobile/diagnosa', data);
     return response.data;
   } catch (error) {
     throw error;
@@ -127,7 +202,7 @@ export const simpanRiwayatDiagnosis = async (data: RiwayatDiagnosisData): Promis
 export const getRiwayatDiagnosis = async (userId: number | null = null): Promise<any> => {
   try {
     const params = userId ? { user_id: userId } : {};
-    const response = await api.get('/mobile/diagnosa', { params }); // ← Ganti dari /diagnosis ke /diagnosa
+    const response = await api.get('/mobile/diagnosa', { params });
     return response.data;
   } catch (error) {
     throw error;
@@ -145,7 +220,18 @@ export const getDetailKerusakan = async (kodeKerusakan: string): Promise<any> =>
 
 export const getDetailRiwayatDiagnosis = async (id: string | number): Promise<any> => {
   try {
-    const response = await api.get(`/mobile/diagnosa/${id}`); // ← Ganti dari /diagnosis ke /diagnosa
+    const response = await api.get(`/mobile/diagnosa/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+
+  
+};
+
+export const hapusRiwayatDiagnosis = async (id: string | number): Promise<any> => {
+  try {
+    const response = await api.delete(`/mobile/diagnosa/${id}`);
     return response.data;
   } catch (error) {
     throw error;
