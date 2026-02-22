@@ -12,10 +12,12 @@ interface GejalaByKategori {
   [kategori: string]: any[];
 }
 
-interface VespaSmartDataResponse {
+export interface VespaSmartDataResponse {
   success: boolean;
   jenis_motor: string;
-  gejala_by_kategori: GejalaByKategori;
+  gejala_by_kategori: {
+    [kategori: string]: GejalaDetail[];
+  };
   total_aturan: number;
 }
 
@@ -37,9 +39,10 @@ export interface HasilDiagnosisFinal {
 }
 
 export interface AturanKandidat {
-  id_aturan: number;
+ id_aturan: number;
   kode_kerusakan: string;
   nama_kerusakan: string;
+  solusi: string;
   kecocokan: {
     persentase: number;
     sudah_cocok: number;
@@ -50,7 +53,7 @@ export interface AturanKandidat {
     sudah_dipilih: GejalaDetail[];
     perlu_dikonfirmasi: GejalaDetail[];
   };
-  status: 'perlu_konfirmasi';
+  status: 'kemungkinan';
 }
 
 export interface KemungkinanKecil {
@@ -111,8 +114,9 @@ interface RiwayatDiagnosisData {
   hasil_diagnosis: DiagnosisResult[];
 }
 
+
 const api: AxiosInstance = axios.create({
-  baseURL: 'http://192.168.1.2:8000/api',
+  baseURL: 'http://192.168.1.7:8000/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -181,14 +185,23 @@ export const prosesDiagnosis = async (
   jenisMotor: string,
   gejala: string[]
 ): Promise<DiagnosisResponse> => {
-  const response = await api.post('/mobile/proses-diagnosis', {
 
+  if (!jenisMotor) {
+    throw new Error('Jenis motor wajib diisi');
+  }
+
+  if (!gejala || gejala.length === 0) {
+    throw new Error('Minimal satu gejala harus dipilih');
+  }
+
+  const response = await api.post('/mobile/proses-diagnosis', {
     jenis_motor: jenisMotor,
     gejala,
   });
 
   return response.data;
 };
+
 
 export const simpanRiwayatDiagnosis = async (data: RiwayatDiagnosisData): Promise<any> => {
   try {

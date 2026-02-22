@@ -44,13 +44,13 @@ interface GejalaItem {
 // ============================================
 
 const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
-  const [jenisMotor, setJenisMotor]                   = useState<string>('');
-  const [gejalaList, setGejalaList]                   = useState<GejalaItem[]>([]);
-  const [gejalaTerpilih, setGejalaTerpilih]           = useState<string[]>([]);
-  const [loading, setLoading]                         = useState<boolean>(false);
-  const [kandidatList, setKandidatList]               = useState<AturanKandidat[]>([]);
+  const [jenisMotor, setJenisMotor] = useState<string>('');
+  const [gejalaList, setGejalaList] = useState<GejalaItem[]>([]);
+  const [gejalaTerpilih, setGejalaTerpilih] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [kandidatList, setKandidatList] = useState<AturanKandidat[]>([]);
   const [showKonfirmasiModal, setShowKonfirmasiModal] = useState<boolean>(false);
-  const [pendingNavData, setPendingNavData]           = useState<any>(null);
+  const [pendingNavData, setPendingNavData] = useState<any>(null);
 
   const jenisMotorOptions: string[] = [
     'Sprint 150',
@@ -63,10 +63,14 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     if (jenisMotor) {
       loadGejalaData();
-    } else {
-      setGejalaList([]);
-      setGejalaTerpilih([]);
     }
+
+    // RESET SEMUA STATE SAAT GANTI MOTOR
+    setGejalaTerpilih([]);
+    setKandidatList([]);
+    setShowKonfirmasiModal(false);
+    setPendingNavData(null);
+
   }, [jenisMotor]);
 
   // ── LOAD DATA ────────────────────────────────────────────────────────
@@ -108,6 +112,7 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
       Alert.alert('Error', 'Pilih jenis motor terlebih dahulu.');
       return;
     }
+
     if (gejalaTerpilih.length === 0) {
       Alert.alert('Error', 'Pilih minimal satu gejala.');
       return;
@@ -115,6 +120,7 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
 
     try {
       setLoading(true);
+
       const response = await prosesDiagnosis(jenisMotor, gejalaTerpilih);
 
       if (!response?.success) {
@@ -122,29 +128,34 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
         return;
       }
 
+      if (
+        !response.hasil_diagnosis &&
+        !response.kemungkinan_kerusakan
+      ) {
+        Alert.alert('Error', 'Data diagnosis tidak valid.');
+        return;
+      }
+
       if (response.status_diagnosis === 'selesai') {
-        const adaKemungkinan = response.kemungkinan_kerusakan.length > 0;
 
         const navData = {
-          jenis_motor:          jenisMotor,
-          gejala_dipilih:       gejalaTerpilih,
-          hasil_diagnosis:      response.hasil_diagnosis,
+          jenis_motor: jenisMotor,
+          gejala_dipilih: gejalaTerpilih,
+          hasil_diagnosis: response.hasil_diagnosis,
           kemungkinan_kerusakan: response.kemungkinan_kerusakan,
         };
 
-        if (adaKemungkinan) {
-          // Ada kemungkinan → tampilkan modal konfirmasi gejala tambahan
+        if (response.kemungkinan_kerusakan.length > 0) {
           setKandidatList(response.kemungkinan_kerusakan);
           setPendingNavData(navData);
           setShowKonfirmasiModal(true);
         } else {
-          // Semua 100%, langsung ke hasil
           navigation.navigate('HasilDiagnosis', { hasil: navData });
         }
-        return; // ← penting: stop di sini
+
+        return;
       }
 
-      // tidak_ditemukan
       Alert.alert('Info', response.message);
 
     } catch (error) {
@@ -163,9 +174,9 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   // ── MODAL: Diagnosis Ulang (dengan gejala tambahan yg dipilih) ───────
-  const handleDiagnosisUlang = (): void => {
+  const handleDiagnosisUlang = async (): Promise<void> => {
     setShowKonfirmasiModal(false);
-    handleDiagnosis();
+    await handleDiagnosis();
   };
 
   // ── RENDER ITEM ──────────────────────────────────────────────────────
@@ -233,9 +244,8 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
               <FlatList
                 data={gejalaList}
                 renderItem={renderGejalaItem}
-                keyExtractor={(item: GejalaItem) => item.kode_gejala}
-                style={styles.gejalaList}
-                contentContainerStyle={styles.gejalaListContent}
+                keyExtractor={(item) => item.kode_gejala}
+                extraData={gejalaTerpilih}
                 showsVerticalScrollIndicator={false}
               />
 
