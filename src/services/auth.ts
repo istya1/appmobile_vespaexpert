@@ -12,8 +12,12 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-  await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('user');
+  try {
+    // Panggil logout backend dulu (pakai token yang masih ada)
+    await api.post('/logout'); // atau '/api/logout' sesuaikan route kamu
+  } catch (error) {
+    console.warn('Logout backend gagal, tapi lanjut clear local');
+  }
 };
 
 export const getCurrentUser = async () => {

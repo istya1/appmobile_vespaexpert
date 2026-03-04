@@ -13,6 +13,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const BASE_URL = 'http://192.168.1.12:8000'; 
+
 type RootStackParamList = {
   VespaPedia: undefined;
   Bengkel: undefined;
@@ -84,14 +86,18 @@ const DashboardScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* PROFILE */}
+        {/* PROFILE CARD di Dashboard atau halaman utama */}
         <TouchableOpacity
           style={styles.profileCard}
           onPress={() => navigation.navigate('Profil')}
         >
           {user?.foto ? (
-            <Image 
-              source={{ uri: user.foto }} 
+            <Image
+              source={{
+                uri: user.foto.startsWith('http')
+                  ? user.foto
+                  : `${BASE_URL}/storage/${user.foto}`
+              }}
               style={styles.profileImage}
             />
           ) : (
@@ -102,7 +108,7 @@ const DashboardScreen = () => {
               {user?.nama?.toUpperCase() || 'PENGGUNA'}
             </Text>
             <Text style={styles.profileDesc}>
-              {user?.jenis_montor || 'Belum memilih motor'}
+              {user?.jenis_motor || 'Belum memilih motor'}  {/* ← GANTI JADI jenis_motor */}
             </Text>
           </View>
         </TouchableOpacity>

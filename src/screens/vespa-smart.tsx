@@ -1,5 +1,5 @@
 // screens/VespaSmartScreen.tsx
-// screens/VespaSmartScreen.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -15,6 +15,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { getVespaSmartData, prosesDiagnosis, AturanKandidat } from '../services/api';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import DiagnosaService from '../services/diagnosa';
 
 // ============================================
 // TYPES
@@ -136,25 +137,31 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
         return;
       }
 
-      if (response.status_diagnosis === 'selesai') {
+      if (response.success) {
 
-        const navData = {
-          jenis_motor: jenisMotor,
-          gejala_dipilih: gejalaTerpilih,
-          hasil_diagnosis: response.hasil_diagnosis,
-          kemungkinan_kerusakan: response.kemungkinan_kerusakan,
-        };
+  await DiagnosaService.simpanDiagnosisMobile({
+    jenis_motor: jenisMotor,
+    gejala_terpilih: gejalaTerpilih,
+    hasil_diagnosis: response.hasil_diagnosis || [],
+  });
 
-        if (response.kemungkinan_kerusakan.length > 0) {
-          setKandidatList(response.kemungkinan_kerusakan);
-          setPendingNavData(navData);
-          setShowKonfirmasiModal(true);
-        } else {
-          navigation.navigate('HasilDiagnosis', { hasil: navData });
-        }
+  const navData = {
+    jenis_motor: jenisMotor,
+    gejala_dipilih: gejalaTerpilih,
+    hasil_diagnosis: response.hasil_diagnosis || [],
+    kemungkinan_kerusakan: response.kemungkinan_kerusakan || [],
+  };
 
-        return;
-      }
+  if (navData.kemungkinan_kerusakan.length > 0) {
+    setKandidatList(navData.kemungkinan_kerusakan);
+    setPendingNavData(navData);
+    setShowKonfirmasiModal(true);
+  } else {
+    navigation.navigate('HasilDiagnosis', { hasil: navData });
+  }
+
+  return;
+}
 
       Alert.alert('Info', response.message);
 

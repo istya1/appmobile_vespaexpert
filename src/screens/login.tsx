@@ -1,109 +1,135 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
+  StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
   Image,
-  StyleSheet,
+  Modal,
+  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { login } from '../services/auth';
-import Toast from 'react-native-toast-message';
+import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen = ({ navigation }: any) => {
+const GOLD = '#D4AF37';
+const DARK_BG = '#111111';
+const CARD_BG = '#1A1A1A';
+const INPUT_BG = '#2A2A2A';
+const BORDER_COLOR = '#3A3A3A';
+
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Modal states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState<'success' | 'error'>('success');
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  const navigation = useNavigation<any>();
+
+  // Proteksi: Kalau sudah login → langsung ke root level (MainApp)
+  useEffect(() => {
+    const checkLogin = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const user = await AsyncStorage.getItem('user');
+      console.log('LOGIN SCREEN CHECK - TOKEN:', token);
+      console.log('LOGIN SCREEN CHECK - USER:', user);
+      if (token && user) {
+        console.log('SUDAH LOGIN → REDIRECT KE MAINAPP (ROOT)');
+        navigation.replace('MainApp'); // ← PASTIKAN 'MainApp'
+      }
+    };
+    checkLogin();
+  }, [navigation]);
+
+  const showModal = (type: 'success' | 'error', title: string, message: string) => {
+    setModalType(type);
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalVisible(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const hideModal = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setModalVisible(false));
+  };
+
   const handleLogin = async () => {
     if (!email.trim()) {
-      Toast.show({
-        type: 'error',
-        text1: 'Email wajib diisi',
-      });
+      showModal('error', 'Email Wajib Diisi', 'Silakan masukkan alamat email Anda.');
       return;
     }
-
     if (!email.includes('@') || !email.includes('.')) {
-      Toast.show({
-        type: 'error',
-        text1: 'Format email tidak valid',
-      });
+      showModal('error', 'Format Email Tidak Valid', 'Contoh: nama@email.com');
       return;
     }
-
     if (!password) {
-      Toast.show({
-        type: 'error',
-        text1: 'Password wajib diisi',
-      });
+      showModal('error', 'Password Wajib Diisi', 'Silakan masukkan kata sandi Anda.');
       return;
     }
 
     setLoading(true);
-
     try {
-      await login(email, password);
+      const response = await login(email, password);
+      console.log('LOGIN RESPONSE FULL:', response);
 
-      Toast.show({
-        type: 'success',
-        text1: 'Login Berhasil ✨',
-        text2: 'Selamat datang kembali di Vespa Expert',
-      });
+      if (response.user.role !== 'pengguna') {
+        showModal('error', 'Akses Ditolak', 'Hanya untuk pengguna biasa.');
+        return;
+      }
+
+      // Simpan token & user
+      await AsyncStorage.setItem('token', response.token || response.access_token || '');
+      await AsyncStorage.setItem('user', JSON.stringify(response.user || {}));
+
+      console.log('TOKEN DISIMPAN:', response.token);
+
+      showModal('success', 'Login Berhasil ✨', 'Selamat datang kembali!');
 
       setTimeout(() => {
+        hideModal();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'MainApp' }],
+          routes: [{ name: 'MainApp' }], // ← PASTIKAN 'MainApp' sesuai root
         });
-      }, 1500);
-
+      }, 1200);
     } catch (error: any) {
-      let message = '';
-
+      let message = 'Terjadi kesalahan';
       if (error.response) {
-        message =
-          error.response.data?.message || 'Email atau password salah';
+        message = error.response.data?.message || 'Email atau password salah';
       } else if (error.request) {
-        message = 'Tidak dapat terhubung ke server';
+        message = 'Tidak bisa terhubung ke server';
       } else {
         message = error.message;
       }
-
-      Toast.show({
-        type: 'error',
-        text1: 'Login Gagal 🚫',
-        text2: message,
-      });
+      showModal('error', 'Login Gagal 🚫', message);
     } finally {
       setLoading(false);
     }
-
-    const response = await login(email, password);
-
-    if (response.user.role !== 'pengguna') {
-      Toast.show({
-        type: 'error',
-        text1: 'Akses hanya untuk pengguna',
-      });
-      return;
-    }
-
   };
 
-
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Logo */}
         <View style={styles.logoContainer}>
@@ -128,6 +154,7 @@ const LoginScreen = ({ navigation }: any) => {
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
+          placeholderTextColor="#777"
         />
 
         {/* Password */}
@@ -141,6 +168,7 @@ const LoginScreen = ({ navigation }: any) => {
             secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
+            placeholderTextColor="#777"
           />
           <TouchableOpacity
             style={styles.eyeButton}
@@ -165,7 +193,7 @@ const LoginScreen = ({ navigation }: any) => {
         >
           {loading ? (
             <View style={styles.loadingRow}>
-              <ActivityIndicator size="small" color="white" />
+              <ActivityIndicator size="small" color="#000" />
               <Text style={styles.loadingText}>Memproses...</Text>
             </View>
           ) : (
@@ -173,54 +201,68 @@ const LoginScreen = ({ navigation }: any) => {
           )}
         </TouchableOpacity>
 
-        {/* Register */}
+        {/* Register Link */}
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
           <Text style={styles.registerText}>
-            Belum punya akun? Daftar di sini
+            Belum punya akun? <Text style={{ color: GOLD, fontWeight: 'bold' }}>Daftar di sini</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Modal Custom */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={hideModal}
+      >
+        <View style={styles.modalOverlay}>
+          <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
+            <MaterialCommunityIcons
+              name={modalType === 'success' ? 'check-circle' : 'alert-circle'}
+              size={60}
+              color={modalType === 'success' ? GOLD : '#EF4444'}
+              style={{ marginBottom: 16 }}
+            />
+            <Text style={styles.modalTitle}>{modalTitle}</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <TouchableOpacity
+              style={[
+                styles.modalButton,
+                modalType === 'success' ? styles.successButton : styles.errorButton,
+              ]}
+              onPress={hideModal}
+            >
+              <Text style={styles.modalButtonText}>
+                {modalType === 'success' ? 'OK, Lanjut' : 'Coba Lagi'}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
 
-export default LoginScreen;
-const GOLD = '#D4AF37';
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111111',
+    backgroundColor: DARK_BG,
   },
-
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 40,
   },
-
   logoContainer: {
     alignItems: 'center',
     marginBottom: 30,
-    marginTop: 20,
   },
-
   logo: {
     width: 200,
     height: 200,
   },
-
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-
-  required: {
-    color: GOLD,
-  },
-
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -228,14 +270,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 6,
   },
-
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
     color: '#AAAAAA',
     marginBottom: 36,
   },
-
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  required: {
+    color: GOLD,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#3A3A3A',
@@ -247,7 +296,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     color: '#FFFFFF',
   },
-
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -257,7 +305,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 30,
   },
-
   passwordInput: {
     flex: 1,
     paddingHorizontal: 18,
@@ -265,48 +312,86 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
   },
-
   eyeButton: {
     paddingHorizontal: 18,
   },
-
   button: {
     borderRadius: 25,
     paddingVertical: 16,
     alignItems: 'center',
+    marginBottom: 20,
   },
-
   buttonNormal: {
     backgroundColor: GOLD,
   },
-
   buttonLoading: {
     backgroundColor: '#B8902F',
   },
-
   buttonText: {
     color: '#000000',
     fontSize: 18,
     fontWeight: '700',
   },
-
   loadingRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   loadingText: {
     color: '#000000',
     fontSize: 18,
     fontWeight: '700',
     marginLeft: 12,
   },
-
   registerText: {
     textAlign: 'center',
-    marginTop: 30,
-    color: GOLD,
+    color: '#AAAAAA',
     fontSize: 15,
-    fontWeight: '600',
+    marginTop: 20,
+  },
+
+  // Modal Custom
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 24,
+    padding: 32,
+    width: '82%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  modalMessage: {
+    fontSize: 15,
+    color: '#CCCCCC',
+    textAlign: 'center',
+    marginBottom: 28,
+  },
+  modalButton: {
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  successButton: {
+    backgroundColor: GOLD,
+  },
+  errorButton: {
+    backgroundColor: '#EF4444',
+  },
+  modalButtonText: {
+    color: '#000000',
+    fontSize: 17,
+    fontWeight: '700',
   },
 });
+
+export default LoginScreen;
