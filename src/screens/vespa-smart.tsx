@@ -139,29 +139,37 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
 
       if (response.success) {
 
-  await DiagnosaService.simpanDiagnosisMobile({
-    jenis_motor: jenisMotor,
-    gejala_terpilih: gejalaTerpilih,
-    hasil_diagnosis: response.hasil_diagnosis || [],
-  });
+        try {
+          await DiagnosaService.simpanDiagnosisMobile({
+            jenis_motor: jenisMotor,
+            gejala_terpilih: gejalaTerpilih,
+            hasil_diagnosis: response.hasil_diagnosis || [],
+            kemungkinan_kerusakan: response.kemungkinan_kerusakan || [],
+          });
+          console.log('✅ Riwayat berhasil disimpan ke /mobile/diagnosa');
+        } catch (saveError: any) {
+          console.error('❌ Gagal simpan riwayat:', saveError.response?.data || saveError.message);
+          // Opsional: tampilkan alert ringan supaya user tahu
+          Alert.alert('Peringatan', 'Hasil diagnosis berhasil, tapi riwayat gagal disimpan. Coba lagi nanti.');
+        }
 
-  const navData = {
-    jenis_motor: jenisMotor,
-    gejala_dipilih: gejalaTerpilih,
-    hasil_diagnosis: response.hasil_diagnosis || [],
-    kemungkinan_kerusakan: response.kemungkinan_kerusakan || [],
-  };
+        const navData = {
+          jenis_motor: jenisMotor,
+          gejala_dipilih: gejalaTerpilih,
+          hasil_diagnosis: response.hasil_diagnosis || [],
+          kemungkinan_kerusakan: response.kemungkinan_kerusakan || [],
+        };
 
-  if (navData.kemungkinan_kerusakan.length > 0) {
-    setKandidatList(navData.kemungkinan_kerusakan);
-    setPendingNavData(navData);
-    setShowKonfirmasiModal(true);
-  } else {
-    navigation.navigate('HasilDiagnosis', { hasil: navData });
-  }
+        if (navData.kemungkinan_kerusakan.length > 0) {
+          setKandidatList(navData.kemungkinan_kerusakan);
+          setPendingNavData(navData);
+          setShowKonfirmasiModal(true);
+        } else {
+          navigation.navigate('HasilDiagnosis', { hasil: navData });
+        }
 
-  return;
-}
+        return;
+      }
 
       Alert.alert('Info', response.message);
 

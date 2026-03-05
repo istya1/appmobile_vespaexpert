@@ -5,8 +5,9 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { getRiwayatDiagnosis, hapusRiwayatDiagnosis } from '../services/api';
+// import { getRiwayatDiagnosis, hapusRiwayatDiagnosis } from '../services/api';
 import { Feather } from '@expo/vector-icons';
+import DiagnosaService from '../services/diagnosa';
 
 interface RiwayatItem {
   id?: number;
@@ -38,22 +39,19 @@ const RiwayatDiagnosisScreen = () => {
 
   // ── Load Data ────────────────────────────────────────────────────────
   const loadRiwayat = async (isRefresh = false): Promise<void> => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-
-    try {
-      const data = await getRiwayatDiagnosis();
-      console.log('RIWAYAT RESPONSE:', JSON.stringify(data, null, 2));
-      if (data.success) {
-        setRiwayat(data.data ?? data.riwayat ?? []);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Gagal memuat riwayat diagnosis.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  if (isRefresh) setRefreshing(true);
+  else setLoading(true);
+  try {
+    const data = await DiagnosaService.getRiwayatMobile();  // ← GANTI KE INI
+    console.log('RIWAYAT RESPONSE:', JSON.stringify(data, null, 2));
+    setRiwayat(data ?? []);  // karena getRiwayatMobile return array langsung (res.data.data || [])
+  } catch (error) {
+    Alert.alert('Error', 'Gagal memuat riwayat diagnosis.');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   // ── Hapus ────────────────────────────────────────────────────────────
   const konfirmasiHapus = (id: number): void => {
@@ -69,7 +67,7 @@ const RiwayatDiagnosisScreen = () => {
 
   const hapusItem = async (id: number): Promise<void> => {
     try {
-      await hapusRiwayatDiagnosis(id);
+      await DiagnosaService.hapusRiwayatDiagnosis(id);
       setRiwayat(prev => prev.filter(item => getId(item) !== id));
     } catch (error) {
       Alert.alert('Error', 'Gagal menghapus riwayat.');
@@ -89,11 +87,11 @@ const RiwayatDiagnosisScreen = () => {
     });
   };
 
-  // ── Render Item ──────────────────────────────────────────────────────
-  const renderItem = ({ item }: { item: RiwayatItem }) => {
-    const kerusakanUtama = item.hasil_diagnosis?.[0];
+// ── Render Item ──────────────────────────────────────────────────────
+const renderItem = ({ item }: { item: RiwayatItem }) => {
+  const kerusakanUtama = item.hasil_diagnosis?.[0];
 
-    return (
+  return (
       <TouchableOpacity
         style={styles.card}
         onPress={() => navigation.navigate('DetailRiwayat', { riwayat: item })}
