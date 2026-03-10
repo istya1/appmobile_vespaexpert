@@ -27,6 +27,9 @@
     "web": {
       "favicon": "./assets/logonw.png",
       "bundler": "metro"
-    }
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker"
+    ]
   }
 }
