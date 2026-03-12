@@ -11,11 +11,10 @@ import {
   ScrollView,
   Animated,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getVespaSmartData, prosesDiagnosis, AturanKandidat } from '../services/api';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DiagnosaService from '../services/diagnosa';
-import { Feather } from '@expo/vector-icons';
 
 const GOLD = '#D4AF37';
 const DARK_BG = '#0A0A0A';
@@ -226,16 +225,10 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* HEADER */}
+      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={26} color="#c9a227" />
-        </TouchableOpacity>
-
-        <View>
-          <Text style={styles.title}>Vespa Smart</Text>
-          <Text style={styles.subtitle}>Diagnosis Kerusakan Vespa</Text>
-        </View>
+        <Text style={styles.headerTitle}>VESPA SMART</Text>
+        <Text style={styles.headerSubtitle}>Smart Diagnosis System</Text>
       </View>
 
       {/* Pilih Jenis Motor (Tombol buka modal) */}
@@ -353,25 +346,24 @@ const styles = StyleSheet.create({
     backgroundColor: DARK_BG,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 30,
-    marginTop: 40,
-    marginBottom: 20,
+    backgroundColor: CARD_BG,
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    alignItems: 'flex-start',
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
   },
-  title: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
+  headerTitle: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    fontWeight: 'bold',
+    letterSpacing: 2,
   },
-
-  subtitle: {
-    color: "#aaa",
-    marginBottom: 20,
-  },
-  backButton: {
-    marginRight: 40,
-    padding: 4,
+  headerSubtitle: {
+    color: GOLD,
+    fontSize: 14,
+    marginTop: 5,
+    letterSpacing: 1,
   },
   pickerWrapper: {
     paddingHorizontal: 20,
