@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 15,
     },
+    
     header: {
         flexDirection: "row",
         alignItems: "center",

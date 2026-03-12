@@ -13,7 +13,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'http://192.168.1.12:8000'; 
+const BASE_URL = 'http://192.168.1.5:8000'; 
 
 type RootStackParamList = {
   VespaPedia: undefined;

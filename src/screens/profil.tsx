@@ -24,7 +24,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 
 const GOLD = '#D4AF37';
-const BASE_URL = 'http://192.168.1.12:8000'; // GANTI DENGAN IP LAPTOP KAMU
+const BASE_URL = 'http://192.168.1.5:8000'; // GANTI DENGAN IP LAPTOP KAMU
 
 const MOTOR_OPTIONS: Array<{ label: string; value: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }> = [
   { label: 'Primavera 150', value: 'Primavera 150', icon: 'scooter' },
