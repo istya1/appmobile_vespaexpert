@@ -1,24 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Alert, ActivityIndicator
+  TouchableOpacity, ActivityIndicator
 } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { simpanRiwayatDiagnosis } from '../services/api';
 import { HasilDiagnosisFinal, AturanKandidat } from '../services/api';
 
 const HasilDiagnosis = () => {
-  const route      = useRoute<RouteProp<any>>();
+  const route = useRoute<RouteProp<any>>();
   const navigation = useNavigation<any>();
-  const hasil      = route.params?.hasil;
+  const hasil = route.params?.hasil;
 
   const [menyimpan, setMenyimpan] = useState<boolean>(false);
   const [sudahDisimpan, setSudahDisimpan] = useState<boolean>(false);
 
-  const hasilDiagnosis: HasilDiagnosisFinal[] = hasil?.hasil_diagnosis       || [];
+  // ✅ FIX TYPE
+  const getPrioritasColor = (prioritas: string) => {
+    if (prioritas === 'Tinggi') return '#FF4C4C';
+    if (prioritas === 'Sedang') return '#FFC107';
+    return '#4CAF50';
+  };
+
+  const hasilDiagnosis: HasilDiagnosisFinal[] = hasil?.hasil_diagnosis || [];
   const kemungkinanKerusakan: AturanKandidat[] = hasil?.kemungkinan_kerusakan || [];
 
-  // ── Simpan otomatis saat screen dibuka ──────────────────────────────
   useEffect(() => {
     if (hasil && !sudahDisimpan) {
       simpanOtomatis();
@@ -29,13 +35,12 @@ const HasilDiagnosis = () => {
     setMenyimpan(true);
     try {
       await simpanRiwayatDiagnosis({
-        jenis_motor:     hasil.jenis_motor,
+        jenis_motor: hasil.jenis_motor,
         gejala_terpilih: hasil.gejala_dipilih ?? [],
         hasil_diagnosis: hasilDiagnosis as any,
       });
       setSudahDisimpan(true);
     } catch (error) {
-      // Gagal simpan tidak perlu ganggu user, cukup log
       console.warn('Gagal menyimpan riwayat:', error);
     } finally {
       setMenyimpan(false);
@@ -58,7 +63,6 @@ const HasilDiagnosis = () => {
         <Text style={styles.title}>Hasil Diagnosis</Text>
         <Text style={styles.subtitle}>{hasil.jenis_motor}</Text>
 
-        {/* Indikator simpan */}
         {menyimpan && (
           <View style={styles.savingBadge}>
             <ActivityIndicator size="small" color="#D4AF37" />
@@ -72,7 +76,7 @@ const HasilDiagnosis = () => {
         )}
       </View>
 
-      {/* ✅ CASE A: Diagnosis Final */}
+      {/* ✅ Diagnosis Final */}
       {hasilDiagnosis.length > 0 ? (
         <>
           <Text style={styles.sectionLabel}>✅ Diagnosis Ditemukan</Text>
@@ -80,11 +84,36 @@ const HasilDiagnosis = () => {
             <View key={index} style={styles.cardFinal}>
               <View style={styles.cardTopRow}>
                 <Text style={styles.kode}>{item.kode_kerusakan}</Text>
-                <View style={styles.matchBadge}>
-                  <Text style={styles.matchBadgeText}>{item.persentase_kecocokan}% cocok</Text>
+
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  {/* 🔥 PRIORITAS */}
+                  <View style={{
+                    backgroundColor: getPrioritasColor((item as any).prioritas ?? 'Rendah'),
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 20
+                  }}>
+                    <Text style={{ color: '#000', fontSize: 11, fontWeight: 'bold' }}>
+                      {(item as any).prioritas ?? 'Rendah'}
+                    </Text>
+                  </View>
+
+                  {/* Persentase */}
+                  <View style={styles.matchBadge}>
+                    <Text style={styles.matchBadgeText}>
+                      {item.persentase_kecocokan}% cocok
+                    </Text>
+                  </View>
                 </View>
               </View>
+
               <Text style={styles.nama}>{item.nama_kerusakan}</Text>
+
+              {/* 🔥 Total Bobot */}
+              <Text style={{ color: '#888', fontSize: 12 }}>
+                Total Bobot: {(item as any).total_bobot ?? 0}
+              </Text>
+
               {item.solusi && (
                 <>
                   <View style={styles.divider} />
@@ -101,40 +130,59 @@ const HasilDiagnosis = () => {
         </View>
       )}
 
-      {/* ⚖️ CASE B: Kemungkinan Kerusakan */}
+      {/* ⚖️ Kemungkinan Kerusakan */}
       {kemungkinanKerusakan.length > 0 && (
         <>
           <Text style={styles.sectionLabel}>⚖️ Kemungkinan Kerusakan</Text>
           <Text style={styles.sectionHint}>Cocok sebagian — perlu konfirmasi gejala tambahan</Text>
+
           {kemungkinanKerusakan.map((item: AturanKandidat, index: number) => (
             <View key={index} style={styles.cardKandidat}>
               <View style={styles.cardTopRow}>
                 <Text style={styles.kodeKandidat}>{item.kode_kerusakan}</Text>
-                <View style={styles.matchBadgeKandidat}>
-                  <Text style={styles.matchBadgeTextKandidat}>{item.kecocokan.persentase}%</Text>
+
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  {/* 🔥 PRIORITAS */}
+                  <View style={{
+                    borderWidth: 1,
+                    borderColor: getPrioritasColor((item as any).prioritas ?? 'Rendah'),
+                    paddingHorizontal: 8,
+                    paddingVertical: 2,
+                    borderRadius: 20
+                  }}>
+                    <Text style={{
+                      color: getPrioritasColor((item as any).prioritas ?? 'Rendah'),
+                      fontSize: 11,
+                      fontWeight: 'bold'
+                    }}>
+                      {(item as any).prioritas ?? 'Rendah'}
+                    </Text>
+                  </View>
+
+                  <View style={styles.matchBadgeKandidat}>
+                    <Text style={styles.matchBadgeTextKandidat}>
+                      {item.kecocokan.persentase}%
+                    </Text>
+                  </View>
                 </View>
               </View>
+
               <Text style={styles.namaKandidat}>{item.nama_kerusakan}</Text>
+
+              {/* 🔥 Total Bobot */}
+              <Text style={{ color: '#666', fontSize: 12 }}>
+                Total Bobot: {(item as any).total_bobot ?? 0}
+              </Text>
+
               <Text style={styles.progressText}>
                 {item.kecocokan.sudah_cocok}/{item.kecocokan.total_rule} gejala cocok
                 {' · '}{item.kecocokan.sisa_konfirmasi} gejala belum dikonfirmasi
               </Text>
-              {item.gejala.perlu_dikonfirmasi.length > 0 && (
-                <>
-                  <Text style={styles.gejalaBelumLabel}>Gejala belum dikonfirmasi:</Text>
-                  {item.gejala.perlu_dikonfirmasi.map(g => (
-                    <Text key={g.kode_gejala} style={styles.gejalaBelumItem}>
-                      • {g.nama_gejala}
-                    </Text>
-                  ))}
-                </>
-              )}
             </View>
           ))}
         </>
       )}
 
-      {/* Tombol ke Riwayat */}
       <TouchableOpacity
         style={styles.riwayatButton}
         onPress={() => navigation.navigate('RiwayatDiagnosis')}

@@ -53,7 +53,16 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
   const [showKonfirmasiModal, setShowKonfirmasiModal] = useState<boolean>(false);
   const [pendingNavData, setPendingNavData] = useState<any>(null);
 
-  const jenisMotorOptions: string[] = [
+  // List motor dengan icon
+const MOTOR_OPTIONS = [
+  { label: 'Sprint 150', value: 'Sprint 150', icon: 'scooter' as const },
+  { label: 'Sprint S 150', value: 'Sprint S 150', icon: 'scooter' as const },
+  { label: 'LX 125', value: 'LX 125', icon: 'scooter' as const },
+  { label: 'Primavera 150', value: 'Primavera 150', icon: 'scooter' as const },
+  { label: 'Primavera S 150', value: 'Primavera S 150', icon: 'scooter' as const },
+];
+
+ const jenisMotorOptions: string[] = [
     'Sprint 150',
     'Sprint S 150',
     'LX 125',
@@ -65,13 +74,6 @@ const VespaSmartScreen: React.FC<Props> = ({ navigation }) => {
     if (jenisMotor) {
       loadGejalaData();
     }
-
-    // RESET SEMUA STATE SAAT GANTI MOTOR
-    setGejalaTerpilih([]);
-    setKandidatList([]);
-    setShowKonfirmasiModal(false);
-    setPendingNavData(null);
-
   }, [jenisMotor]);
 
   // ── LOAD DATA ────────────────────────────────────────────────────────
