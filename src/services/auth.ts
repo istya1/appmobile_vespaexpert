@@ -1,3 +1,4 @@
+import axios from 'axios';
 import api from './api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -23,4 +24,9 @@ export const logout = async () => {
 export const getCurrentUser = async () => {
   const user = await AsyncStorage.getItem('user');
   return user ? JSON.parse(user) : null;
+};
+
+export const resendVerification = async (email: string) => {
+  const response = await axios.post('/api/resend-verification', { email });
+  return response.data;
 };

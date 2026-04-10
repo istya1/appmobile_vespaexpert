@@ -24,12 +24,15 @@ import VespaPedia from '../screens/vespa-pedia';
 import VespaSmart from '../screens/vespa-smart';
 import HubungiKami from '../screens/hubungi-kami';
 import VespaCare from '../screens/vespa-care';
-import BengkelScreen from '../screens/bengkel';
+import BengkelScreen from '../screens/bengkel-list';
+import BengkelDetail from '../screens/bengkel-detail';
 import DashboardFooter from '../components/footer';
 import NotifikasiScreen from '../screens/notifikasi';
 import VespaDetail from '../screens/vespa-detail';
 import HasilDiagnosis from '../screens/hasil-diagnosis';
 import RiwayatDiagnosisScreen from '../screens/riwayat';
+import ForgotPasswordScreen from '../screens/lupa-password';
+import ResetPasswordScreen from '../screens/reset-password';
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -47,6 +50,9 @@ export type RootStackParamList = {
   Notifikasi: undefined;
   VespaDetail: undefined;
   HasilDiagnosis: { hasil: any };
+  ForgotPassword: undefined;
+  ResetPassword: undefined;
+  BengkelDetail: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -58,6 +64,8 @@ const AuthStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="Register" component={RegisterScreen} />
+     <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
   </Stack.Navigator>
 );
 
@@ -75,9 +83,11 @@ const MainStack = () => (
       <Stack.Screen name="VespaCare" component={VespaCare} />
       <Stack.Screen name="Profil" component={ProfileScreen} />
       <Stack.Screen name="Bengkel" component={BengkelScreen} />
+      <Stack.Screen name="BengkelDetail" component={BengkelDetail} />
       <Stack.Screen name="Notifikasi" component={NotifikasiScreen} />
       <Stack.Screen name="VespaDetail" component={VespaDetail} />
       <Stack.Screen name="HasilDiagnosis" component={HasilDiagnosis} />
+     
       {/* Register & Login sudah dipindah ke AuthStack */}
     </Stack.Navigator>
     <DashboardFooter />

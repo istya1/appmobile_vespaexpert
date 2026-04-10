@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login } from '../services/auth';
+import { login, resendVerification } from '../services/auth'; // Pastikan resendVerification sudah dibuat
 import { useNavigation } from '@react-navigation/native';
 
 const GOLD = '#D4AF37';
@@ -29,26 +29,28 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'success' | 'error'>('success');
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
-  const fadeAnim = useState(new Animated.Value(0))[0];
 
+  // State khusus untuk email belum diverifikasi
+  const [isEmailNotVerified, setIsEmailNotVerified] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
+  const fadeAnim = useState(new Animated.Value(0))[0];
   const navigation = useNavigation<any>();
 
-  // Proteksi: Kalau sudah login → langsung ke root level (MainApp)
+  // Proteksi: Kalau sudah login → langsung ke MainApp
   useEffect(() => {
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem('token');
       const user = await AsyncStorage.getItem('user');
-      console.log('LOGIN SCREEN CHECK - TOKEN:', token);
-      console.log('LOGIN SCREEN CHECK - USER:', user);
       if (token && user) {
-        console.log('SUDAH LOGIN → REDIRECT KE MAINAPP (ROOT)');
-        navigation.replace('MainApp'); // ← PASTIKAN 'MainApp'
+        navigation.replace('MainApp');
       }
     };
     checkLogin();
@@ -71,7 +73,14 @@ const LoginScreen = () => {
       toValue: 0,
       duration: 200,
       useNativeDriver: true,
-    }).start(() => setModalVisible(false));
+    }).start(() => {
+      setModalVisible(false);
+      // Reset state verifikasi setelah modal ditutup
+      if (isEmailNotVerified) {
+        setIsEmailNotVerified(false);
+        setUnverifiedEmail('');
+      }
+    });
   };
 
   const handleLogin = async () => {
@@ -89,20 +98,15 @@ const LoginScreen = () => {
     }
 
     setLoading(true);
+    setIsEmailNotVerified(false);
+    setUnverifiedEmail('');
+
     try {
       const response = await login(email, password);
-      console.log('LOGIN RESPONSE FULL:', response);
-
-      if (response.user.role !== 'pengguna') {
-        showModal('error', 'Akses Ditolak', 'Hanya untuk pengguna biasa.');
-        return;
-      }
 
       // Simpan token & user
       await AsyncStorage.setItem('token', response.token || response.access_token || '');
       await AsyncStorage.setItem('user', JSON.stringify(response.user || {}));
-
-      console.log('TOKEN DISIMPAN:', response.token);
 
       showModal('success', 'Login Berhasil ✨', 'Selamat datang kembali!');
 
@@ -110,26 +114,73 @@ const LoginScreen = () => {
         hideModal();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'MainApp' }], // ← PASTIKAN 'MainApp' sesuai root
+          routes: [{ name: 'MainApp' }],
         });
       }, 1200);
     } catch (error: any) {
       let message = 'Terjadi kesalahan';
+      const statusCode = error.response?.status;
+
       if (error.response) {
         message = error.response.data?.message || 'Email atau password salah';
+
+        // === PENANGANAN KHUSUS EMAIL BELUM DIVERIFIKASI ===
+        if (statusCode === 403 && 
+            message.toLowerCase().includes('belum diverifikasi')) {
+          
+          setIsEmailNotVerified(true);
+          setUnverifiedEmail(email);
+
+          showModal(
+            'error',
+            'Email Belum Diverifikasi',
+            'Silakan cek inbox atau folder spam email Anda untuk link verifikasi.\n\n' +
+            'Atau kirim ulang email verifikasi sekarang.'
+          );
+          return;
+        }
       } else if (error.request) {
         message = 'Tidak bisa terhubung ke server';
       } else {
         message = error.message;
       }
+
       showModal('error', 'Login Gagal 🚫', message);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fungsi Kirim Ulang Verifikasi
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+
+    setResendLoading(true);
+
+    try {
+      await resendVerification(unverifiedEmail);
+
+      showModal(
+        'success',
+        'Email Terkirim Ulang ✅',
+        'Link verifikasi baru telah dikirim ke email Anda.\n\nSilakan cek inbox atau folder spam.'
+      );
+
+      setIsEmailNotVerified(false);
+      setUnverifiedEmail('');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Gagal mengirim ulang email. Coba lagi nanti.';
+      showModal('error', 'Gagal Mengirim Ulang', msg);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Logo */}
         <View style={styles.logoContainer}>
@@ -182,7 +233,11 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Button */}
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgotPassword}>Lupa Password?</Text>
+        </TouchableOpacity>
+
+        {/* Button Login */}
         <TouchableOpacity
           onPress={handleLogin}
           disabled={loading}
@@ -226,17 +281,37 @@ const LoginScreen = () => {
             />
             <Text style={styles.modalTitle}>{modalTitle}</Text>
             <Text style={styles.modalMessage}>{modalMessage}</Text>
+
             <TouchableOpacity
               style={[
                 styles.modalButton,
                 modalType === 'success' ? styles.successButton : styles.errorButton,
               ]}
-              onPress={hideModal}
+              onPress={
+                modalType === 'success' || !isEmailNotVerified
+                  ? hideModal
+                  : handleResendVerification
+              }
+              disabled={resendLoading}
             >
               <Text style={styles.modalButtonText}>
-                {modalType === 'success' ? 'OK, Lanjut' : 'Coba Lagi'}
+                {modalType === 'success'
+                  ? 'OK, Lanjut'
+                  : isEmailNotVerified
+                  ? (resendLoading ? 'Mengirim...' : 'Kirim Ulang Verifikasi')
+                  : 'Coba Lagi'}
               </Text>
             </TouchableOpacity>
+
+            {/* Tombol Tutup tambahan jika email belum diverifikasi */}
+            {isEmailNotVerified && modalType === 'error' && (
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: '#374151', marginTop: 12 }]}
+                onPress={hideModal}
+              >
+                <Text style={[styles.modalButtonText, { color: '#FFFFFF' }]}>Tutup</Text>
+              </TouchableOpacity>
+            )}
           </Animated.View>
         </View>
       </Modal>
@@ -287,8 +362,8 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#3A3A3A',
-    backgroundColor: '#2A2A2A',
+    borderColor: BORDER_COLOR,
+    backgroundColor: INPUT_BG,
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 16,
@@ -300,10 +375,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#3A3A3A',
-    backgroundColor: '#2A2A2A',
+    borderColor: BORDER_COLOR,
+    backgroundColor: INPUT_BG,
     borderRadius: 20,
-    marginBottom: 30,
+    marginBottom: 12,
   },
   passwordInput: {
     flex: 1,
@@ -314,6 +389,12 @@ const styles = StyleSheet.create({
   },
   eyeButton: {
     paddingHorizontal: 18,
+  },
+  forgotPassword: {
+    color: GOLD,
+    textAlign: 'right',
+    marginBottom: 30,
+    fontSize: 15,
   },
   button: {
     borderRadius: 25,
@@ -348,8 +429,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 20,
   },
-
-  // Modal Custom
+  // Modal Styles
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.75)',
@@ -368,12 +448,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 12,
+    textAlign: 'center',
   },
   modalMessage: {
     fontSize: 15,
     color: '#CCCCCC',
     textAlign: 'center',
     marginBottom: 28,
+    lineHeight: 22,
   },
   modalButton: {
     width: '100%',

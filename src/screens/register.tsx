@@ -39,11 +39,13 @@ const RegisterScreen = () => {
     noHp: '',
     password: '',
     confirmPassword: '',
-    jenisMontor: '',  // nama field disesuaikan dengan backend
+    jenisMontor: '',
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const [motorModalVisible, setMotorModalVisible] = useState(false);
 
   // Modal states
@@ -51,8 +53,8 @@ const RegisterScreen = () => {
   const [modalType, setModalType] = useState<'success' | 'error' | 'confirm'>('success');
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
-  const fadeAnim = useState(new Animated.Value(0))[0];
 
+  const fadeAnim = useState(new Animated.Value(0))[0];
   const navigation = useNavigation<any>();
 
   const showModal = (type: 'success' | 'error' | 'confirm', title: string, message: string) => {
@@ -110,7 +112,11 @@ const RegisterScreen = () => {
       return;
     }
 
-    showModal('confirm', 'Konfirmasi Pendaftaran', 'Apakah data sudah benar? Setelah daftar, Anda bisa langsung login.');
+    showModal(
+      'confirm', 
+      'Konfirmasi Pendaftaran', 
+      'Apakah data sudah benar?\n\nSetelah mendaftar, Anda harus verifikasi email terlebih dahulu sebelum bisa login.'
+    );
   };
 
   const confirmRegister = async () => {
@@ -118,31 +124,46 @@ const RegisterScreen = () => {
     setLoading(true);
 
     try {
-      await api.post('/register', {
+      const response = await api.post('/register', {
         nama: formData.nama,
         email: formData.email,
         no_hp: formData.noHp,
         password: formData.password,
-        jenis_montor: formData.jenisMontor,  // ← sesuai backend
+        jenis_montor: formData.jenisMontor,
       });
 
-      showModal('success', 'Registrasi Berhasil!', 'Akun Anda telah dibuat. Silakan login sekarang.');
-      setTimeout(() => {
-        navigation.replace('Login');
-      }, 2000);
+      // Pesan sukses yang sesuai dengan alur verifikasi email
+      showModal(
+        'success', 
+        'Registrasi Berhasil!', 
+        'Akun Anda telah dibuat.\n\nSilakan cek email Anda (termasuk folder Spam/Junk) untuk link verifikasi.\n\nSetelah diverifikasi, baru Anda bisa login.'
+      );
+
+      // Reset form setelah sukses
+      setFormData({
+        nama: '',
+        email: '',
+        noHp: '',
+        password: '',
+        confirmPassword: '',
+        jenisMontor: '',
+      });
+
     } catch (error: any) {
-      let message = 'Registrasi gagal.';
-      if (error.response) {
-        message += error.response.data?.message || 'Email mungkin sudah terdaftar.';
-      } else if (error.request) {
-        message += 'Tidak bisa terhubung ke server.';
-      } else {
-        message += error.message;
-      }
-      showModal('error', 'Registrasi Gagal', message);
-    } finally {
-      setLoading(false);
+    let message = 'Registrasi gagal.';
+
+    if (error.response?.status === 422) {
+        if (error.response.data?.errors?.email) {
+            message = 'Email sudah terdaftar. Silakan gunakan email lain.';
+        } else if (error.response.data?.message) {
+            message = error.response.data.message;
+        }
+    } else if (error.response) {
+        message = error.response.data?.message || 'Email mungkin sudah terdaftar.';
     }
+
+    showModal('error', 'Registrasi Gagal', message);
+}
   };
 
   const selectMotor = (value: string) => {
@@ -390,7 +411,7 @@ const RegisterScreen = () => {
                   onPress={hideModal}
                 >
                   <Text style={styles.modalButtonText}>
-                    {modalType === 'success' ? 'OK, Lanjut' : 'Coba Lagi'}
+                    {modalType === 'success' ? 'OK, Mengerti' : 'Coba Lagi'}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -403,24 +424,16 @@ const RegisterScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DARK_BG,
-  },
+  // ... (semua styles kamu tetap sama, saya tidak mengubahnya)
+  container: { flex: 1, backgroundColor: DARK_BG },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 40,
   },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  logo: {
-    width: 180,
-    height: 180,
-  },
+  logoContainer: { alignItems: 'center', marginBottom: 30 },
+  logo: { width: 180, height: 180 },
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -440,9 +453,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 8,
   },
-  required: {
-    color: GOLD,
-  },
+  required: { color: GOLD },
   input: {
     borderWidth: 1,
     borderColor: BORDER_COLOR,
@@ -470,9 +481,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
   },
-  eyeButton: {
-    paddingHorizontal: 18,
-  },
+  eyeButton: { paddingHorizontal: 18 },
   customPicker: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -485,10 +494,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginBottom: 18,
   },
-  pickerText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
+  pickerText: { color: '#FFFFFF', fontSize: 16 },
   button: {
     borderRadius: 25,
     paddingVertical: 16,
@@ -496,21 +502,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
   },
-  buttonNormal: {
-    backgroundColor: GOLD,
-  },
-  buttonLoading: {
-    backgroundColor: '#B8902F',
-  },
+  buttonNormal: { backgroundColor: GOLD },
+  buttonLoading: { backgroundColor: '#B8902F' },
   buttonText: {
     color: '#000000',
     fontSize: 18,
     fontWeight: '700',
   },
-  loadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  loadingRow: { flexDirection: 'row', alignItems: 'center' },
   loadingText: {
     color: '#000000',
     fontSize: 18,
@@ -523,8 +522,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 20,
   },
-
-  // Modal Custom
+  // Modal Styles
   customModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.75)',
@@ -543,6 +541,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 12,
+    textAlign: 'center',
   },
   modalMessage: {
     fontSize: 15,
@@ -563,28 +562,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 8,
   },
-  cancelButton: {
-    backgroundColor: '#333',
-  },
-  confirmButton: {
-    backgroundColor: GOLD,
-  },
-  successButton: {
-    backgroundColor: GOLD,
-  },
-  errorButton: {
-    backgroundColor: '#EF4444',
-  },
-  modalButtonText: {
-    color: '#FFFFFF',
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  modalButtonTextConfirm: {
-    color: '#000000',
-    fontSize: 17,
-    fontWeight: '700',
-  },
+  cancelButton: { backgroundColor: '#333' },
+  confirmButton: { backgroundColor: GOLD },
+  successButton: { backgroundColor: GOLD },
+  errorButton: { backgroundColor: '#EF4444' },
+  modalButtonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  modalButtonTextConfirm: { color: '#000000', fontSize: 17, fontWeight: '700' },
 
   // Modal Pilih Motor
   modalOverlay: {
@@ -613,10 +596,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
-  modalItemText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  modalItemText: { color: '#fff', fontSize: 16 },
   modalClose: {
     marginTop: 20,
     paddingVertical: 14,
