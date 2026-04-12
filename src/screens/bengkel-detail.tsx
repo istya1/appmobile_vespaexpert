@@ -14,6 +14,7 @@ import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
+import BengkelService from '../services/bengkel';
 
 const { width } = Dimensions.get('window');
 const GOLD = '#D4AF37';
@@ -51,19 +52,19 @@ export default function BengkelDetailScreen() {
     fetchBengkelDetail();
   }, [bengkelId]);
 
-  const fetchBengkelDetail = async () => {
-    try {
-      setLoading(true);
-      // Ganti dengan service/API kamu (bisa pakai fetch atau Axios)
-  const response = await fetch(`http://192.168.1.7:8000/api/bengkel/${bengkelId}`);
-      const data: BengkelData = await response.json();
-      setBengkel(data);
-    } catch (error) {
-      console.error('Gagal mengambil detail bengkel:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchBengkelDetail = async () => {
+  try {
+    setLoading(true);
+
+    const data = await BengkelService.getById(Number(bengkelId));
+    setBengkel(data); // ⬅️ langsung data (karena sudah return response.data)
+
+  } catch (error) {
+    console.error('Gagal mengambil detail bengkel:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading || !bengkel) {
     return (

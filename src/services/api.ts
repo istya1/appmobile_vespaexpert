@@ -1,6 +1,19 @@
 // services/api.ts
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { API_URL } from '@env';
+
+interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+if (!API_URL) {
+  console.warn('⚠️ EXPO_PUBLIC_API_URL tidak ditemukan di .env');
+}
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -115,7 +128,7 @@ interface RiwayatDiagnosisData {
 }
 
 const api: AxiosInstance = axios.create({
-  baseURL: 'http://192.168.1.7:8000/api',
+  baseURL: API_URL,        // ← tetap pakai API_URL
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
