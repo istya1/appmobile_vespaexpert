@@ -31,7 +31,7 @@ const DashboardFooter = () => {
             navigation.navigate('Main', { screen: 'VespaCare' })
           }
         >
-          <MaterialCommunityIcons name="wrench-clock" size={26} color="#555555" />
+          <MaterialCommunityIcons name="wrench-clock" size={26} color="#6B7280" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -41,7 +41,7 @@ const DashboardFooter = () => {
           }
           activeOpacity={0.85}
         >
-          <MaterialCommunityIcons name="tools" size={30} color="#111111" />
+          <MaterialCommunityIcons name="tools" size={30} color="#FFFFFF" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -50,7 +50,7 @@ const DashboardFooter = () => {
             navigation.navigate('Main', { screen: 'Riwayat' })
           }
         >
-          <MaterialCommunityIcons name="history" size={26} color="#555555" />
+          <MaterialCommunityIcons name="history" size={26} color="#6B7280" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -59,7 +59,7 @@ const DashboardFooter = () => {
             navigation.navigate('Main', { screen: 'Profil' })
           }
         >
-          <MaterialCommunityIcons name="account-circle" size={26} color="#555555" />
+          <MaterialCommunityIcons name="account-circle" size={26} color="#6B7280" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -70,11 +70,11 @@ export default DashboardFooter;
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: "#000000",
+    backgroundColor: "#FFFFFF",
   },
   goldLine: {
     height: 1.5,
-    backgroundColor: '#D4AF37',
+    backgroundColor: '#E5E7EB',
     width: '100%',
   },
   container: {
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     height: 65,
     paddingHorizontal: 12,
     justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
   },
   item: {
     flex: 1,
@@ -94,7 +95,8 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#D4AF37',
+    backgroundColor: '#4A90E2',
+    borderColor: '#D4AF37',
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 10,

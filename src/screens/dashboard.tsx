@@ -25,6 +25,14 @@ type RootStackParamList = {
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 const { width } = Dimensions.get('window');
 
+const PRIMARY = '#4A90E2';   // biru utama
+const BG = '#FFFFFF';
+const CARD = '#F9FAFB';
+const TEXT_MAIN = '#111827';
+const TEXT_SUB = '#6B7280';
+const BORDER = '#E5E7EB';
+const GOLD = '#D4AF37'; // aksen kecil
+
 const vespaData = [
   {
     name: 'Vespa Sprint 150',
@@ -82,7 +90,7 @@ const DashboardScreen = () => {
           </View>
 
           <TouchableOpacity onPress={() => navigation.navigate('Notifikasi')}>
-            <MaterialCommunityIcons name="bell-outline" size={24} color="#D4AF37" />
+            <MaterialCommunityIcons name="bell-outline" size={24} color={PRIMARY} />
           </TouchableOpacity>
         </View>
 
@@ -101,7 +109,7 @@ const DashboardScreen = () => {
               style={styles.profileImage}
             />
           ) : (
-            <MaterialCommunityIcons name="account-circle" size={42} color="#D4AF37" />
+            <MaterialCommunityIcons name="account-circle" size={42} color={PRIMARY} />
           )}
           <View style={{ marginLeft: 12, flex: 1 }}>
             <Text style={styles.profileName}>
@@ -163,19 +171,19 @@ const DashboardScreen = () => {
           <Text style={styles.bengkelHeader}>Bengkel Resmi Vespa</Text>
 
           <View style={styles.row}>
-            <MaterialCommunityIcons name="map-marker" size={18} color="#D4AF37" />
+            <MaterialCommunityIcons name="map-marker" size={18} color={PRIMARY} />
             <Text style={styles.bengkelText}>
               Jl. Mayjen Sungkono No.4, Madiun
             </Text>
           </View>
 
           <View style={styles.row}>
-            <MaterialCommunityIcons name="phone" size={18} color="#D4AF37" />
+            <MaterialCommunityIcons name="phone" size={18} color={PRIMARY} />
             <Text style={styles.bengkelText}>081234567890</Text>
           </View>
 
           <View style={styles.row}>
-            <MaterialCommunityIcons name="clock-outline" size={18} color="#D4AF37" />
+            <MaterialCommunityIcons name="clock-outline" size={18} color={PRIMARY} />
             <Text style={styles.bengkelText}>
               Senin - Minggu (08.30 - 19.30)
             </Text>
@@ -192,7 +200,7 @@ export default DashboardScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111111',
+    backgroundColor: BG,
   },
 
   row: {
@@ -205,50 +213,55 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 20,
     marginBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: BORDER,
+    paddingBottom: 12,
   },
 
   title: {
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
     fontSize: 22,
     fontWeight: '700',
   },
 
   subtitle: {
-    color: '#D4AF37',
+    color: TEXT_SUB,
     fontSize: 12,
   },
 
   profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2A2A2A',
-    marginHorizontal: 20,
-    padding: 15,
-    borderRadius: 25,
-    marginBottom: 20,
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: CARD,
+  marginHorizontal: 20,
+  padding: 15,
+  borderRadius: 20,
+  marginBottom: 20,
+  borderWidth: 2,
+  borderColor: PRIMARY,
+},
 
   profileImage: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    borderWidth: 1,
-    borderColor: '#D4AF37',
+    borderWidth: 2,
+    borderColor: BORDER,
   },
 
-  profileName: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-  },
+ profileName: {
+  color: TEXT_MAIN,
+  fontWeight: '700',
+  fontSize: 14,
+},
 
-  profileDesc: {
-    color: '#AAAAAA',
-    fontSize: 12,
-    marginTop: 2,
-  },
+profileDesc: {
+  color: TEXT_SUB,
+  fontSize: 12,
+  marginTop: 2,
+},
 
   heroImage: {
     width: '100%',
@@ -264,12 +277,12 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
     fontWeight: '600',
   },
 
   seeAll: {
-    color: '#D4AF37',
+    color: PRIMARY,
     fontSize: 12,
   },
 
@@ -289,7 +302,7 @@ const styles = StyleSheet.create({
 
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
 
   koleksiTextContainer: {
@@ -305,7 +318,7 @@ const styles = StyleSheet.create({
   },
 
   koleksiSubtitle: {
-    color: '#DDDDDD',
+    color: '#FFFFFF',
     fontSize: 13,
   },
 
@@ -313,7 +326,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     right: 15,
-    backgroundColor: '#D4AF37',
+    backgroundColor: GOLD,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
@@ -326,21 +339,24 @@ const styles = StyleSheet.create({
   },
 
   bengkelCard: {
-    backgroundColor: '#2A2A2A',
-    marginHorizontal: 20,
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 40,
-  },
+  backgroundColor: CARD,
+  marginHorizontal: 20,
+  marginTop: 20,
+  padding: 20,
+  borderRadius: 20,
+  marginBottom: 40,
+  borderWidth: 1,
+  borderColor: BORDER,
+},
 
   bengkelHeader: {
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
     fontWeight: '700',
     marginBottom: 10,
   },
 
   bengkelText: {
-    color: '#CCCCCC',
+    color: TEXT_SUB,
     marginLeft: 8,
     flex: 1,
   },

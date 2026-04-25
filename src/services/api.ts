@@ -128,12 +128,12 @@ interface RiwayatDiagnosisData {
 }
 
 const api: AxiosInstance = axios.create({
-  baseURL: API_URL,        // ← tetap pakai API_URL
+  baseURL: 'https://appraiser-pasty-helpline.ngrok-free.dev/api',
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 10000,
 });
 
 // Interceptor untuk menambahkan token

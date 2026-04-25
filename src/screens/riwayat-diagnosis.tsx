@@ -132,8 +132,6 @@ export default function RiwayatDiagnosa() {
                                     {formatTanggal(item.created_at)}
                                 </Text>
                             </View>
-
-                            <Text style={styles.status}>Sudah diperbaiki</Text>
                         </View>
 
                     </View>

@@ -110,60 +110,60 @@ const ProfileScreen = () => {
     }
   };
 
- const pickImage = async () => {
-  try {
-    // Minta izin akses galeri
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Izin Ditolak', 'Izinkan akses galeri untuk mengunggah foto.');
-      return;
-    }
+  const pickImage = async () => {
+    try {
+      // Minta izin akses galeri
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Izin Ditolak', 'Izinkan akses galeri untuk mengunggah foto.');
+        return;
+      }
 
-    // Buka galeri untuk pilih foto
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1], // kotak untuk avatar
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const selectedImage = result.assets[0];
-      const uri = selectedImage.uri;
-
-      // Tampilkan loading
-      setLoading(true);
-
-      // Buat FormData untuk upload
-      const formData = new FormData();
-      formData.append('foto', {
-        uri,
-        name: `profile_${Date.now()}.jpg`,
-        type: 'image/jpeg',
-      } as any);
-
-      // Panggil endpoint upload di backend (sesuaikan dengan route kamu)
-      const uploadResponse = await api.post(`/users/${user.id_user}/upload-photo`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      // Buka galeri untuk pilih foto
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
       });
 
-      // Update foto di state & AsyncStorage
-      const newFoto = uploadResponse.data.foto; // backend return full URL foto
-      const updatedUser = { ...user, foto: newFoto };
-      setUser(updatedUser);
-      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedImage = result.assets[0];
+        const uri = selectedImage.uri;
 
-      showModal('success', 'Berhasil!', 'Foto profil berhasil diunggah.');
+        // Tampilkan loading
+        setLoading(true);
+
+        // Buat FormData untuk upload
+        const formData = new FormData();
+        formData.append('foto', {
+          uri,
+          name: `profile_${Date.now()}.jpg`,
+          type: 'image/jpeg',
+        } as any);
+
+        // Panggil endpoint upload di backend (sesuaikan dengan route kamu)
+        const uploadResponse = await api.post(`/users/${user.id_user}/upload-photo`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        // Update foto di state & AsyncStorage
+        const newFoto = uploadResponse.data.foto; // backend return full URL foto
+        const updatedUser = { ...user, foto: newFoto };
+        setUser(updatedUser);
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+
+        showModal('success', 'Berhasil!', 'Foto profil berhasil diunggah.');
+      }
+    } catch (error: any) {
+      console.error('Upload foto error:', error);
+      showModal('error', 'Gagal', error.response?.data?.message || 'Gagal mengunggah foto. Coba lagi.');
+    } finally {
+      setLoading(false);
     }
-  } catch (error: any) {
-    console.error('Upload foto error:', error);
-    showModal('error', 'Gagal', error.response?.data?.message || 'Gagal mengunggah foto. Coba lagi.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleSave = async () => {
     if (form.newPassword && form.newPassword.length < 6) {
@@ -254,7 +254,11 @@ const ProfileScreen = () => {
           <Image
             source={
               user?.foto
-                ? { uri: user.foto.startsWith('http') ? user.foto : `${BASE_URL}/storage/${user.foto}` }
+                ? {
+                  uri: user.foto.startsWith('http')
+                    ? user.foto
+                    : `${BASE_URL}/storage/${user.foto}`
+                }
                 : require('../../assets/ava.png')
             }
             style={styles.avatarImage}

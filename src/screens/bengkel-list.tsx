@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import BengkelService from '../services/bengkel';
 
@@ -24,7 +24,13 @@ type RootStackParamList = {
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 const { width } = Dimensions.get('window');
-const GOLD = '#D4AF37';
+
+const PRIMARY = '#4A90E2';   // biru utama
+const BACKGROUND = '#F9FAFB'; // putih soft
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
 
 const BengkelListScreen = () => {
   const navigation = useNavigation<NavProp>();
@@ -93,7 +99,7 @@ const BengkelListScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={GOLD} />
+        <ActivityIndicator size="large" color={PRIMARY} />
         <Text style={styles.loadingText}>Memuat daftar bengkel...</Text>
       </View>
     );
@@ -102,8 +108,16 @@ const BengkelListScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>DAFTAR BENGKEL</Text>
-        <Text style={styles.subtitle}>Bengkel Resmi Vespa Terdekat</Text>
+
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color={PRIMARY} />
+        </TouchableOpacity>
+
+        <View style={{ marginLeft: 12 }}>
+          <Text style={styles.title}>DAFTAR BENGKEL</Text>
+          <Text style={styles.subtitle}>Bengkel Resmi Vespa Terdekat</Text>
+        </View>
+
       </View>
 
       <View style={styles.searchContainer}>
@@ -121,7 +135,7 @@ const BengkelListScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={GOLD} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={PRIMARY} />
         }
       >
         {filteredBengkel.map((bengkel) => (
@@ -171,38 +185,45 @@ const BengkelListScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0E0E0E' },
+  container: { flex: 1, backgroundColor: BACKGROUND },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0E0E0E',
+    backgroundColor: BACKGROUND,
   },
   loadingText: { color: '#999', marginTop: 10, fontSize: 14 },
-  header: { paddingHorizontal: 20, paddingTop: 50, paddingBottom: 20 },
-  title: { fontSize: 24, fontWeight: '700', color: '#fff' },
-  subtitle: { fontSize: 13, color: GOLD, marginTop: 4 },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+    marginBottom: 20,
+  },
+  title: { fontSize: 24, fontWeight: '700', color: TEXT },
+  subtitle: { fontSize: 13, color: PRIMARY, marginTop: 4 },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F1F1F',
+    backgroundColor: CARD,
     marginHorizontal: 20,
     paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 25,
+    paddingVertical: 12,
+    borderRadius: 12,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: GOLD,
+    borderColor: BORDER,
   },
   searchInput: { flex: 1, marginLeft: 10, color: '#fff', fontSize: 14 },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 100 },
   card: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 20,
+    backgroundColor: CARD,
+    borderRadius: 16,
     marginBottom: 20,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: GOLD,
+    borderWidth: 2,
+    borderColor: BORDER,
   },
   bengkelImage: { width: '100%', height: 180 },
   noImageContainer: {
@@ -218,13 +239,13 @@ const styles = StyleSheet.create({
     height: 180,
   },
   cardContent: { padding: 16 },
-  bengkelName: { fontSize: 19, fontWeight: '700', color: '#fff' },
-  alamat: { fontSize: 13, color: '#aaa', marginTop: 6, lineHeight: 18 },
+  bengkelName: { fontSize: 19, fontWeight: '700', color: TEXT },
+  alamat: { color: SUBTEXT, fontSize: 13, marginTop: 6, lineHeight: 18 },
   infoRow: { flexDirection: 'row', marginTop: 12, justifyContent: 'space-between' },
-  rating: { color: GOLD, fontWeight: '600', fontSize: 15 },
-  jarak: { color: '#999', fontSize: 13 },
+  rating: { color: PRIMARY, fontWeight: '600', fontSize: 15 },
+  jarak: { color: SUBTEXT, fontSize: 13 },
   emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 80 },
-  emptyText: { color: '#555', marginTop: 15, fontSize: 16 },
+  emptyText: { color: SUBTEXT, marginTop: 15, fontSize: 16 },
 });
 
 export default BengkelListScreen;

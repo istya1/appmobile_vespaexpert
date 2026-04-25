@@ -21,44 +21,51 @@ export interface VespaPediaDetail {
   }[];
 }
 
+const BASE_URL = 'https://appraiser-pasty-helpline.ngrok-free.dev';
+
 class VespaPediaService {
-  // Get list vespa (hanya kategori Pengenalan)
   async getList(search?: string): Promise<VespaPediaItem[]> {
     try {
       const params: any = { kategori: 'Pengenalan', status: 'published' };
-      if (search) {
-        params.search = search;
-      }
+      if (search) params.search = search;
+
       const response = await api.get('/vespa-pedia', { params });
-      return response.data;
+
+      // Normalize gambar_url
+      return response.data.map((item: VespaPediaItem) => ({
+        ...item,
+        gambar_url: this.normalizeImageUrl(item.gambar_url),
+      }));
     } catch (error: any) {
       console.error('Error fetching vespa list:', error);
       throw new Error(error.response?.data?.message || 'Gagal mengambil data vespa');
     }
   }
 
-  // Get detail by jenis motor
-    async getDetail(jenisMotor: string): Promise<VespaPediaItem[]> {
+  async getDetail(jenisMotor: string): Promise<VespaPediaItem[]> {
     try {
       const response = await api.get('/vespa-pedia', {
-        params: { 
-          jenis_motor: jenisMotor,
-          status: 'published'
-        }
+        params: { jenis_motor: jenisMotor, status: 'published' }
       });
-      return response.data;
+
+      // Normalize gambar_url
+      return response.data.map((item: VespaPediaItem) => ({
+        ...item,
+        gambar_url: this.normalizeImageUrl(item.gambar_url),
+      }));
     } catch (error: any) {
       console.error('Error fetching vespa detail:', error);
       throw new Error(error.response?.data?.message || 'Gagal mengambil detail vespa');
     }
   }
 
-  // Get image URL
-  getImageUrl(filename: string | null): string | null {
-    if (!filename) return null;
-    // Sesuaikan dengan base URL Laravel Anda
-    return `http://192.168.1.100:8000/storage/vespa-pedia/${filename}`;
+  // Normalize URL — handle path relatif maupun full URL
+  normalizeImageUrl(url?: string | null): string | null {
+    if (!url) return null;
+    if (url.startsWith('http')) return url; // sudah full URL
+    return `${BASE_URL}/storage/${url}`;    // path relatif → full URL
   }
 }
+
 
 export default new VespaPediaService();

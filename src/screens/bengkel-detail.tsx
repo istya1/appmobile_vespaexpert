@@ -17,7 +17,13 @@ import { WebView } from 'react-native-webview';
 import BengkelService from '../services/bengkel';
 
 const { width } = Dimensions.get('window');
-const GOLD = '#D4AF37';
+
+const PRIMARY = '#4A90E2';
+const BACKGROUND = '#F9FAFB';
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
 
 type RootStackParamList = {
   BengkelDetail: { bengkelId: number | string };
@@ -69,7 +75,7 @@ export default function BengkelDetailScreen() {
   if (loading || !bengkel) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={GOLD} />
+        <ActivityIndicator size="large" color={PRIMARY} />
         <Text style={styles.loadingText}>Memuat detail bengkel...</Text>
       </View>
     );
@@ -129,8 +135,8 @@ export default function BengkelDetailScreen() {
             style={styles.buttonMap}
             onPress={() => Linking.openURL(MAPS_DIRECTION)}
           >
-            <MaterialIcons name="directions" size={20} color={GOLD} />
-            <Text style={[styles.buttonText, { color: GOLD }]}>Petunjuk Arah</Text>
+            <MaterialIcons name="directions" size={20} color={PRIMARY} />
+            <Text style={[styles.buttonText, { color: PRIMARY }]}>Petunjuk Arah</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -199,7 +205,7 @@ export default function BengkelDetailScreen() {
 // Komponen Pembantu
 const LayananItem = ({ icon, title }: { icon: string; title: string }) => (
   <View style={styles.layananItem}>
-    <MaterialCommunityIcons name={icon as any} size={32} color={GOLD} />
+    <MaterialCommunityIcons name={icon as any} size={32} color={PRIMARY} />
     <Text style={styles.layananText}>{title}</Text>
   </View>
 );
@@ -216,7 +222,7 @@ const KontakItem = ({
   onPress?: () => void;
 }) => (
   <TouchableOpacity style={styles.kontakItem} onPress={onPress} disabled={!onPress}>
-    <MaterialCommunityIcons name={icon as any} size={24} color={GOLD} />
+    <MaterialCommunityIcons name={icon as any} size={24} color={PRIMARY} />
     <View style={styles.kontakTextContainer}>
       <Text style={styles.kontakTitle}>{title}</Text>
       <Text style={styles.kontakValue}>{value}</Text>
@@ -228,31 +234,34 @@ const KontakItem = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111111',
+    backgroundColor: BACKGROUND,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#111111',
+    backgroundColor: BACKGROUND,
   },
   loadingText: {
-    color: '#999',
+    color: SUBTEXT,
     marginTop: 10,
   },
-  header: {
-    backgroundColor: '#2A2A2A',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
+ header: {
+  backgroundColor: CARD,
+  paddingTop: 30,
+  paddingHorizontal: 20,
+  paddingBottom: 20,
+  borderBottomLeftRadius: 30,
+  borderBottomRightRadius: 30,
+  borderBottomWidth: 1,
+  borderBottomColor: BORDER,
+},
+
   headerContent: {
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: TEXT,
     fontSize: 22,
     fontWeight: '700',
   },
@@ -262,16 +271,16 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   rating: {
-    color: GOLD,
+    color: PRIMARY,
     fontSize: 16,
     fontWeight: '700',
   },
   ulasan: {
-    color: '#AAAAAA',
+    color: SUBTEXT,
     fontSize: 12,
   },
   resmi: {
-    color: '#CCCCCC',
+    color: SUBTEXT,
     fontSize: 12,
     marginTop: 4,
   },
@@ -283,7 +292,7 @@ const styles = StyleSheet.create({
   },
   buttonPhone: {
     flexDirection: 'row',
-    backgroundColor: GOLD,
+    backgroundColor: PRIMARY,
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 25,
@@ -292,9 +301,9 @@ const styles = StyleSheet.create({
   },
   buttonMap: {
     flexDirection: 'row',
-    backgroundColor: '#111111',
+    backgroundColor: BACKGROUND,
     borderWidth: 1,
-    borderColor: GOLD,
+    borderColor: PRIMARY,
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 25,
@@ -303,7 +312,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: '600',
-    color: '#000000',
+    color: '#FFFFFF',
   },
   mapContainer: {
     marginTop: 25,
@@ -316,21 +325,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  section: {
-    backgroundColor: '#2A2A2A',
-    marginHorizontal: 20,
-    marginTop: 20,
-    padding: 20,
-    borderRadius: 20,
-  },
+ section: {
+  backgroundColor: CARD,
+  marginHorizontal: 20,
+  marginTop: 20,
+  padding: 20,
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: BORDER,
+},
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: TEXT,
     marginBottom: 12,
   },
   sectionText: {
-    color: '#CCCCCC',
+    color: SUBTEXT,
     lineHeight: 22,
   },
   layananGrid: {
@@ -346,7 +357,7 @@ const styles = StyleSheet.create({
   layananText: {
     marginTop: 8,
     textAlign: 'center',
-    color: '#CCCCCC',
+    color: SUBTEXT,
     fontSize: 12,
   },
   kontakItem: {
@@ -358,10 +369,10 @@ const styles = StyleSheet.create({
   kontakTextContainer: { flex: 1 },
   kontakTitle: {
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: TEXT,
   },
   kontakValue: {
-    color: '#CCCCCC',
+    color: SUBTEXT,
     marginTop: 2,
     fontSize: 12,
   },

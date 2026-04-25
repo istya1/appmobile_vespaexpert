@@ -18,12 +18,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import api from '../services/api';
 import { useNavigation } from '@react-navigation/native';
 
-const GOLD = '#D4AF37';
-const DARK_BG = '#111111';
-const CARD_BG = '#1A1A1A';
-const INPUT_BG = '#2A2A2A';
-const BORDER_COLOR = '#3A3A3A';
+const ACCENT = '#4A90E2';   // biru utama
+const BG = '#FFFFFF';   // putih
+const CARD_BG = '#EAF4FF';   // biru sangat muda
+const INPUT_BG = '#F9FBFF';   // putih kebiruan
+const BORDER_COLOR = '#D6E4F0';   // abu kebiruan
+const TEXT_MAIN = '#2D3748';   // abu gelap
+const TEXT_SUB = '#718096';   // abu
+const GOLD = '#E6B85C';   // aksen kecil
 
+// Daftar pilihan jenis motor Vespa
 const MOTOR_OPTIONS = [
   { label: 'Primavera 150', value: 'Primavera 150' },
   { label: 'Primavera S 150', value: 'Primavera S 150' },
@@ -33,6 +37,8 @@ const MOTOR_OPTIONS = [
 ];
 
 const RegisterScreen = () => {
+
+  // ==================== STATE FORM ====================
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
@@ -42,26 +48,34 @@ const RegisterScreen = () => {
     jenisMontor: '',
   });
 
+  // State untuk toggle visibility password
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const [motorModalVisible, setMotorModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);                    // State loading saat registrasi
 
-  // Modal states
+  const [motorModalVisible, setMotorModalVisible] = useState(false); // Modal pilihan jenis motor
+
+  // ==================== STATE MODAL ====================
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'success' | 'error' | 'confirm'>('success');
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
 
+  // Animasi fade untuk modal
   const fadeAnim = useState(new Animated.Value(0))[0];
-  const navigation = useNavigation<any>();
 
+  const navigation = useNavigation<any>();   // Hook untuk navigasi antar screen
+
+  // ==================== FUNGSI MODAL ====================
+
+  // Menampilkan modal dengan animasi
   const showModal = (type: 'success' | 'error' | 'confirm', title: string, message: string) => {
     setModalType(type);
     setModalTitle(title);
     setModalMessage(message);
     setModalVisible(true);
+
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 300,
@@ -69,6 +83,7 @@ const RegisterScreen = () => {
     }).start();
   };
 
+  // Menyembunyikan modal dengan animasi
   const hideModal = () => {
     Animated.timing(fadeAnim, {
       toValue: 0,
@@ -77,12 +92,17 @@ const RegisterScreen = () => {
     }).start(() => setModalVisible(false));
   };
 
+  // ==================== VALIDASI & REGISTRASI ====================
+
+  // Validasi form sebelum menampilkan konfirmasi
   const handleRegister = () => {
-    // Validasi
+    // Validasi Nama
     if (!formData.nama.trim()) {
       showModal('error', 'Nama Wajib Diisi', 'Silakan masukkan nama lengkap Anda.');
       return;
     }
+
+    // Validasi Email
     if (!formData.email.trim()) {
       showModal('error', 'Email Wajib Diisi', 'Silakan masukkan alamat email.');
       return;
@@ -91,14 +111,20 @@ const RegisterScreen = () => {
       showModal('error', 'Format Email Tidak Valid', 'Contoh: nama@email.com');
       return;
     }
+
+    // Validasi No HP
     if (!formData.noHp.trim()) {
       showModal('error', 'No HP Wajib Diisi', 'Silakan masukkan nomor HP.');
       return;
     }
+
+    // Validasi Jenis Motor
     if (!formData.jenisMontor) {
       showModal('error', 'Jenis Motor Wajib Dipilih', 'Pilih salah satu jenis Vespa.');
       return;
     }
+
+    // Validasi Password
     if (!formData.password) {
       showModal('error', 'Password Wajib Diisi', 'Silakan masukkan kata sandi.');
       return;
@@ -107,24 +133,28 @@ const RegisterScreen = () => {
       showModal('error', 'Password Terlalu Pendek', 'Minimal 6 karakter.');
       return;
     }
+
+    // Validasi Konfirmasi Password
     if (formData.password !== formData.confirmPassword) {
       showModal('error', 'Konfirmasi Tidak Cocok', 'Password dan konfirmasi tidak sama.');
       return;
     }
 
+    // Jika semua validasi lolos, tampilkan modal konfirmasi
     showModal(
-      'confirm', 
-      'Konfirmasi Pendaftaran', 
+      'confirm',
+      'Konfirmasi Pendaftaran',
       'Apakah data sudah benar?\n\nSetelah mendaftar, Anda harus verifikasi email terlebih dahulu sebelum bisa login.'
     );
   };
 
+  // Proses registrasi ke backend setelah konfirmasi
   const confirmRegister = async () => {
     setModalVisible(false);
     setLoading(true);
 
     try {
-      const response = await api.post('/register', {
+      await api.post('/register', {
         nama: formData.nama,
         email: formData.email,
         no_hp: formData.noHp,
@@ -132,14 +162,14 @@ const RegisterScreen = () => {
         jenis_montor: formData.jenisMontor,
       });
 
-      // Pesan sukses yang sesuai dengan alur verifikasi email
+      // Tampilkan pesan sukses dengan instruksi verifikasi email
       showModal(
-        'success', 
-        'Registrasi Berhasil!', 
+        'success',
+        'Registrasi Berhasil!',
         'Akun Anda telah dibuat.\n\nSilakan cek email Anda (termasuk folder Spam/Junk) untuk link verifikasi.\n\nSetelah diverifikasi, baru Anda bisa login.'
       );
 
-      // Reset form setelah sukses
+      // Reset form setelah registrasi berhasil
       setFormData({
         nama: '',
         email: '',
@@ -148,24 +178,26 @@ const RegisterScreen = () => {
         confirmPassword: '',
         jenisMontor: '',
       });
-
     } catch (error: any) {
-    let message = 'Registrasi gagal.';
+      let message = 'Registrasi gagal.';
 
-    if (error.response?.status === 422) {
+      if (error.response?.status === 422) {
         if (error.response.data?.errors?.email) {
-            message = 'Email sudah terdaftar. Silakan gunakan email lain.';
+          message = 'Email sudah terdaftar. Silakan gunakan email lain.';
         } else if (error.response.data?.message) {
-            message = error.response.data.message;
+          message = error.response.data.message;
         }
-    } else if (error.response) {
+      } else if (error.response) {
         message = error.response.data?.message || 'Email mungkin sudah terdaftar.';
-    }
+      }
 
-    showModal('error', 'Registrasi Gagal', message);
-}
+      showModal('error', 'Registrasi Gagal', message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Fungsi memilih jenis motor dari modal
   const selectMotor = (value: string) => {
     setFormData({ ...formData, jenisMontor: value });
     setMotorModalVisible(false);
@@ -177,7 +209,8 @@ const RegisterScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Logo */}
+
+        {/* Logo Aplikasi */}
         <View style={styles.logoContainer}>
           <Image
             source={require('../../assets/logonw.png')}
@@ -189,7 +222,7 @@ const RegisterScreen = () => {
         <Text style={styles.title}>Daftar Akun Baru</Text>
         <Text style={styles.subtitle}>Sistem Diagnosa Vespa Matic</Text>
 
-        {/* Nama */}
+        {/* Input Nama Lengkap */}
         <Text style={styles.label}>
           Nama Lengkap <Text style={styles.required}>*</Text>
         </Text>
@@ -202,7 +235,7 @@ const RegisterScreen = () => {
           placeholderTextColor="#777"
         />
 
-        {/* Email */}
+        {/* Input Email */}
         <Text style={styles.label}>
           Email <Text style={styles.required}>*</Text>
         </Text>
@@ -216,7 +249,7 @@ const RegisterScreen = () => {
           placeholderTextColor="#777"
         />
 
-        {/* No HP */}
+        {/* Input No HP */}
         <Text style={styles.label}>
           No HP <Text style={styles.required}>*</Text>
         </Text>
@@ -229,7 +262,7 @@ const RegisterScreen = () => {
           placeholderTextColor="#777"
         />
 
-        {/* Jenis Motor */}
+        {/* Pilih Jenis Motor */}
         <Text style={styles.label}>
           Jenis Motor <Text style={styles.required}>*</Text>
         </Text>
@@ -243,7 +276,7 @@ const RegisterScreen = () => {
           <MaterialCommunityIcons name="chevron-down" size={24} color={GOLD} />
         </TouchableOpacity>
 
-        {/* Modal Pilih Motor */}
+        {/* Modal Pilih Jenis Motor */}
         <Modal
           visible={motorModalVisible}
           transparent
@@ -260,7 +293,7 @@ const RegisterScreen = () => {
                   <TouchableOpacity
                     style={[
                       styles.modalItem,
-                      formData.jenisMontor === item.value && { backgroundColor: '#333' },
+                      formData.jenisMontor === item.value && { backgroundColor: '#EEF6FF', borderRadius: 12, borderWidth: 1, borderColor: GOLD },
                     ]}
                     onPress={() => selectMotor(item.value)}
                   >
@@ -279,7 +312,7 @@ const RegisterScreen = () => {
           </View>
         </Modal>
 
-        {/* Password */}
+        {/* Input Password */}
         <Text style={styles.label}>
           Password <Text style={styles.required}>*</Text>
         </Text>
@@ -304,7 +337,7 @@ const RegisterScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Konfirmasi Password */}
+        {/* Input Konfirmasi Password */}
         <Text style={styles.label}>
           Konfirmasi Password <Text style={styles.required}>*</Text>
         </Text>
@@ -321,6 +354,7 @@ const RegisterScreen = () => {
             style={styles.eyeButton}
             onPress={() => setShowConfirmPassword(!showConfirmPassword)}
           >
+
             <MaterialCommunityIcons
               name={showConfirmPassword ? 'eye' : 'eye-off'}
               size={24}
@@ -329,7 +363,7 @@ const RegisterScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Button Daftar */}
+        {/* Tombol Daftar */}
         <TouchableOpacity
           onPress={handleRegister}
           disabled={loading}
@@ -348,15 +382,16 @@ const RegisterScreen = () => {
           )}
         </TouchableOpacity>
 
-        {/* Login Link */}
+        {/* Link ke Halaman Login */}
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.loginText}>
-            Sudah punya akun? <Text style={{ color: GOLD, fontWeight: 'bold' }}>Masuk di sini</Text>
+            Sudah punya akun? <Text style={{ color: ACCENT, fontWeight: 'bold' }}>Masuk di sini</Text>
           </Text>
         </TouchableOpacity>
+
       </ScrollView>
 
-      {/* Modal Custom */}
+      {/* ==================== MODAL CUSTOM ==================== */}
       <Modal
         visible={modalVisible}
         transparent
@@ -365,24 +400,27 @@ const RegisterScreen = () => {
       >
         <View style={styles.customModalOverlay}>
           <Animated.View style={[styles.customModalContent, { opacity: fadeAnim }]}>
+
+            {/* Icon modal */}
             <MaterialCommunityIcons
               name={
                 modalType === 'success'
                   ? 'check-circle'
                   : modalType === 'error'
-                  ? 'alert-circle'
-                  : 'help-circle'
+                    ? 'alert-circle'
+                    : 'help-circle'
               }
               size={64}
               color={
                 modalType === 'success'
                   ? GOLD
                   : modalType === 'error'
-                  ? '#EF4444'
-                  : GOLD
+                    ? '#EF4444'
+                    : GOLD
               }
               style={{ marginBottom: 20 }}
             />
+
             <Text style={styles.customModalTitle}>{modalTitle}</Text>
             <Text style={styles.modalMessage}>{modalMessage}</Text>
 
@@ -423,9 +461,10 @@ const RegisterScreen = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
-  // ... (semua styles kamu tetap sama, saya tidak mengubahnya)
-  container: { flex: 1, backgroundColor: DARK_BG },
+
+  container: { flex: 1, backgroundColor: BG },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -438,19 +477,19 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#AAAAAA',
+    color: TEXT_SUB,
     marginBottom: 36,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
     marginBottom: 8,
   },
   required: { color: GOLD },
@@ -463,7 +502,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     fontSize: 16,
     marginBottom: 18,
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -479,7 +518,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 16,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: TEXT_MAIN,
   },
   eyeButton: { paddingHorizontal: 18 },
   customPicker: {
@@ -494,7 +533,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginBottom: 18,
   },
-  pickerText: { color: '#FFFFFF', fontSize: 16 },
+  pickerText: { color: TEXT_MAIN, fontSize: 16 },
   button: {
     borderRadius: 25,
     paddingVertical: 16,
@@ -502,7 +541,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
   },
-  buttonNormal: { backgroundColor: GOLD },
+  buttonNormal: { backgroundColor: ACCENT },
   buttonLoading: { backgroundColor: '#B8902F' },
   buttonText: {
     color: '#000000',
@@ -530,22 +569,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   customModalContent: {
-    backgroundColor: CARD_BG,
+    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 32,
     width: '82%',
     alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#E5E7EB',
   },
   customModalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 12,
     textAlign: 'center',
   },
   modalMessage: {
     fontSize: 15,
-    color: '#CCCCCC',
+    color: '#6B7280',
     textAlign: 'center',
     marginBottom: 28,
     lineHeight: 22,
@@ -562,21 +603,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 8,
   },
-  cancelButton: { backgroundColor: '#333' },
+  cancelButton: { backgroundColor: '#F3F4F6' },
   confirmButton: { backgroundColor: GOLD },
   successButton: { backgroundColor: GOLD },
   errorButton: { backgroundColor: '#EF4444' },
-  modalButtonText: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  modalButtonText: { color: '#374151', fontSize: 17, fontWeight: '700' },
   modalButtonTextConfirm: { color: '#000000', fontSize: 17, fontWeight: '700' },
 
   // Modal Pilih Motor
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: CARD_BG,
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -585,7 +626,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: GOLD,
+    color: TEXT_MAIN,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -594,18 +635,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    borderBottomColor: '#E5E7EB',
   },
-  modalItemText: { color: '#fff', fontSize: 16 },
+  modalItemText: { color: TEXT_MAIN, fontSize: 16 },
   modalClose: {
     marginTop: 20,
     paddingVertical: 14,
-    backgroundColor: '#333',
+    backgroundColor: '#F3F4F6',
     borderRadius: 12,
     alignItems: 'center',
   },
   modalCloseText: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
     fontWeight: '600',
   },

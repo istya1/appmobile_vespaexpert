@@ -14,8 +14,9 @@ const DashboardHeader = () => {
       {/* Header Bar */}
       <View style={styles.topRow}>
         <Text style={styles.title}>VESPA EXPERT</Text>
+        <Text style={styles.subtitle}>Aplikasi Vespa Matic</Text>
         <TouchableOpacity>
-          <MaterialCommunityIcons name="bell" size={24} color="#FFFFFF" />
+          <MaterialCommunityIcons name="bell" size={24} color="#4A90E2" />
         </TouchableOpacity>
       </View>
     </View>
@@ -26,10 +27,12 @@ export default DashboardHeader;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1E40AF', // blue-800
-    paddingTop: 32, // pt-12
-    paddingBottom: 10, // pb-6
+    backgroundColor: '#FFFFFF',
+    paddingTop: 32,
+    paddingBottom: 16,
     paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
   topRow: {
     flexDirection: 'row',
@@ -38,9 +41,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    color: '#FFFFFF',
+    color: '#111827',
     fontSize: 24,
     fontWeight: '700',
+  },
+  subtitle: {
+    color: '#6B7280',
+    fontSize: 12,
+    marginTop: 2,
   },
   searchBar: {
     flexDirection: 'row',
