@@ -14,6 +14,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import DiagnosaService from '../services/diagnosa'; // sesuaikan path
 
+const PRIMARY = '#4A90E2';
+const BACKGROUND = '#F9FAFB';
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
+
 interface RiwayatItem {
     id?: number;
     id_diagnosa?: number;
@@ -94,7 +101,7 @@ export default function RiwayatDiagnosa() {
                         style={styles.hapusButton}
                         onPress={() => konfirmasiHapus(getId(item))}
                     >
-                        <Feather name="trash-2" size={20} color="#777" />
+                        <Feather name="trash-2" size={20} color={SUBTEXT} />
                     </TouchableOpacity>
                 </View>
 
@@ -127,7 +134,7 @@ export default function RiwayatDiagnosa() {
 
                         <View style={styles.footerRow}>
                             <View style={styles.clockRow}>
-                                <Feather name="clock" size={14} color="#D4AF37" />
+                                <Feather name="clock" size={14} color={PRIMARY} />
                                 <Text style={styles.tanggal}>
                                     {formatTanggal(item.created_at)}
                                 </Text>
@@ -161,7 +168,7 @@ export default function RiwayatDiagnosa() {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={() => loadRiwayat(true)}
-                        tintColor="#D4AF37"
+                        tintColor={PRIMARY}
                     />
                 }
                 ListEmptyComponent={
@@ -175,17 +182,17 @@ export default function RiwayatDiagnosa() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0A0A0A' },
-    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    container: { flex: 1, backgroundColor: BACKGROUND },
+    center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: BACKGROUND, },
     loadingText: { color: '#aaa', marginTop: 16, fontSize: 15 },
     listContent: { padding: 16, paddingBottom: 40 },
     card: {
-        backgroundColor: "#1A1A1A",
+        backgroundColor: CARD,
         borderRadius: 18,
         padding: 28,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: "#3A2E12",
+        borderColor: BORDER,
     },
     cardTopRow: {
         flexDirection: 'row',
@@ -193,20 +200,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12,
     },
-    jenisMotor: { color: '#D4AF37', fontSize: 16, fontWeight: '700' },
+    jenisMotor: { color: PRIMARY, fontSize: 16, fontWeight: '700' },
     hapusButton: { padding: 6 },
     kerusakanRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
     kodeBadge: {
-        backgroundColor: '#2A2A2A',
+        backgroundColor: '#EFF6FF',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 6,
         marginRight: 10,
+        borderWidth: 1,
+        borderColor: PRIMARY,
     },
-    kodeText: { color: '#D4AF37', fontSize: 13, fontWeight: 'bold' },
-    namaKerusakan: { color: '#FFFFFF', fontSize: 15, flex: 1 },
-    tidakDitemukan: { color: '#777', fontSize: 14, fontStyle: 'italic' },
-    lebihBanyak: { color: '#888', fontSize: 13, marginBottom: 10 },
+    kodeText: { color: PRIMARY, fontSize: 13, fontWeight: 'bold' },
+    namaKerusakan: { color: TEXT, fontSize: 15, flex: 1 },
+    tidakDitemukan: { color: SUBTEXT, fontSize: 14, fontStyle: 'italic' },
+    lebihBanyak: { color: SUBTEXT, fontSize: 13, marginBottom: 10 },
     footerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -214,16 +223,16 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     clockRow: { flexDirection: 'row', alignItems: 'center' },
-    tanggal: { color: '#D4AF37', fontSize: 13, marginLeft: 6 },
+    tanggal: { color: PRIMARY, fontSize: 13, marginLeft: 6 },
     status: {
-        color: "#D4AF37",
+        color: PRIMARY,
         borderWidth: 1,
-        borderColor: "#D4AF37",
+        borderColor: PRIMARY,
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 20,
         fontSize: 12
     },
     emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
-    emptyText: { color: '#888', fontSize: 16 },
+    emptyText: { color: SUBTEXT, fontSize: 16 },
 });

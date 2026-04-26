@@ -23,36 +23,43 @@ import AuthService from '../services/auth-mobile';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 
-const GOLD = '#D4AF37';
+// ── Design tokens (sama dengan DashboardScreen) ──────────────────────────────
+const PRIMARY   = '#4A90E2';
+const BG        = '#FFFFFF';
+const CARD      = '#F9FAFB';
+const TEXT_MAIN = '#111827';
+const TEXT_SUB  = '#6B7280';
+const BORDER    = '#E5E7EB';
+const DANGER    = '#EF4444';
+
 const BASE_URL = 'https://appraiser-pasty-helpline.ngrok-free.dev';
 
-const MOTOR_OPTIONS: Array<{ label: string; value: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }> = [
-  { label: 'Primavera 150', value: 'Primavera 150', icon: 'scooter' },
+const MOTOR_OPTIONS: Array<{
+  label: string;
+  value: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+}> = [
+  { label: 'Primavera 150',   value: 'Primavera 150',   icon: 'scooter' },
   { label: 'Primavera S 150', value: 'Primavera S 150', icon: 'scooter' },
-  { label: 'LX 125', value: 'LX 125', icon: 'scooter' },
-  { label: 'Sprint 150', value: 'Sprint 150', icon: 'scooter' },
-  { label: 'Sprint S 150', value: 'Sprint S 150', icon: 'scooter' },
+  { label: 'LX 125',          value: 'LX 125',          icon: 'scooter' },
+  { label: 'Sprint 150',      value: 'Sprint 150',      icon: 'scooter' },
+  { label: 'Sprint S 150',    value: 'Sprint S 150',    icon: 'scooter' },
 ];
 
 const ProfileScreen = () => {
-  const [user, setUser] = useState<any>(null);
-  const [editMode, setEditMode] = useState(false);
+  const [user, setUser]                   = useState<any>(null);
+  const [editMode, setEditMode]           = useState(false);
   const [form, setForm] = useState({
-    nama: '',
-    no_hp: '',
-    alamat: '',
-    jenis_motor: '',
-    oldPassword: '',
-    newPassword: '',
-    confirmNewPassword: '',
+    nama: '', no_hp: '', alamat: '', jenis_motor: '',
+    oldPassword: '', newPassword: '', confirmNewPassword: '',
   });
-  const [motorModalVisible, setMotorModalVisible] = useState(false);
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [motorModalVisible,   setMotorModalVisible]   = useState(false);
+  const [logoutModalVisible,  setLogoutModalVisible]  = useState(false);
+  const [loading,  setLoading]  = useState(false);
+  const [saving,   setSaving]   = useState(false);
   const navigation = useNavigation<any>();
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showOldPassword,     setShowOldPassword]     = useState(false);
+  const [showNewPassword,     setShowNewPassword]     = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
@@ -60,8 +67,11 @@ const ProfileScreen = () => {
   const [modalType, setModalType] = useState<'confirm' | 'success' | 'error'>('confirm');
   const fadeAnim = useState(new Animated.Value(0))[0];
 
-  // Fungsi showModal (untuk semua modal konfirmasi, sukses, error)
-  const showModal = (type: 'confirm' | 'success' | 'error', title: string, message: string) => {
+  const showModal = (
+    type: 'confirm' | 'success' | 'error',
+    title: string,
+    message: string,
+  ) => {
     setModalType(type);
     setModalMessage(message);
     if (type === 'confirm') {
@@ -72,106 +82,63 @@ const ProfileScreen = () => {
       Alert.alert(title, message);
       return;
     }
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
   };
 
-  useEffect(() => {
-    loadUser();
-  }, []);
+  useEffect(() => { loadUser(); }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadUser();
-    }, [])
-  );
+  useFocusEffect(React.useCallback(() => { loadUser(); }, []));
 
   const loadUser = async () => {
     try {
-      const storedUser = await AsyncStorage.getItem('user');
-      if (storedUser) {
-        const parsed = JSON.parse(storedUser);
+      const stored = await AsyncStorage.getItem('user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
         setUser(parsed);
         setForm({
-          nama: parsed.nama || '',
-          no_hp: parsed.no_hp || '',
-          alamat: parsed.alamat || '',
-          jenis_motor: parsed.jenis_motor || '',
-          oldPassword: '',
-          newPassword: '',
-          confirmNewPassword: '',
+          nama:             parsed.nama       || '',
+          no_hp:            parsed.no_hp      || '',
+          alamat:           parsed.alamat     || '',
+          jenis_motor:      parsed.jenis_motor || '',
+          oldPassword: '', newPassword: '', confirmNewPassword: '',
         });
       }
-    } catch (error) {
-      console.error('Gagal load user:', error);
-    }
+    } catch (e) { console.error('Gagal load user:', e); }
   };
 
   const pickImage = async () => {
     try {
-      // Minta izin akses galeri
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Izin Ditolak', 'Izinkan akses galeri untuk mengunggah foto.');
         return;
       }
-
-      // Buka galeri untuk pilih foto
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
+        mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8,
       });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const selectedImage = result.assets[0];
-        const uri = selectedImage.uri;
-
-        // Tampilkan loading
+      if (!result.canceled && result.assets?.length > 0) {
+        const uri = result.assets[0].uri;
         setLoading(true);
-
-        // Buat FormData untuk upload
         const formData = new FormData();
-        formData.append('foto', {
-          uri,
-          name: `profile_${Date.now()}.jpg`,
-          type: 'image/jpeg',
-        } as any);
-
-        // Panggil endpoint upload di backend (sesuaikan dengan route kamu)
-        const uploadResponse = await api.post(`/users/${user.id_user}/upload-photo`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        formData.append('foto', { uri, name: `profile_${Date.now()}.jpg`, type: 'image/jpeg' } as any);
+        const res = await api.post(`/users/${user.id_user}/upload-photo`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
-
-        // Update foto di state & AsyncStorage
-        const newFoto = uploadResponse.data.foto; // backend return full URL foto
-        const updatedUser = { ...user, foto: newFoto };
+        const updatedUser = { ...user, foto: res.data.foto };
         setUser(updatedUser);
         await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-
         showModal('success', 'Berhasil!', 'Foto profil berhasil diunggah.');
       }
-    } catch (error: any) {
-      console.error('Upload foto error:', error);
-      showModal('error', 'Gagal', error.response?.data?.message || 'Gagal mengunggah foto. Coba lagi.');
-    } finally {
-      setLoading(false);
-    }
+    } catch (e: any) {
+      showModal('error', 'Gagal', e.response?.data?.message || 'Gagal mengunggah foto. Coba lagi.');
+    } finally { setLoading(false); }
   };
 
   const handleSave = async () => {
-    if (form.newPassword && form.newPassword.length < 6) {
+    if (form.newPassword && form.newPassword.length < 6)
       return showModal('error', 'Kesalahan', 'Password baru minimal 6 karakter');
-    }
-    if (form.newPassword && form.newPassword !== form.confirmNewPassword) {
+    if (form.newPassword && form.newPassword !== form.confirmNewPassword)
       return showModal('error', 'Kesalahan', 'Konfirmasi password tidak cocok');
-    }
     showModal('confirm', 'Konfirmasi', 'Apakah Anda yakin ingin menyimpan perubahan profil?');
   };
 
@@ -179,66 +146,38 @@ const ProfileScreen = () => {
     setConfirmModalVisible(false);
     setSaving(true);
     try {
-      const response = await api.put(`/users/${user.id_user}`, {
-        nama: form.nama,
-        no_hp: form.no_hp,
-        alamat: form.alamat,
-        jenis_motor: form.jenis_motor,
+      const res = await api.put(`/users/${user.id_user}`, {
+        nama: form.nama, no_hp: form.no_hp, alamat: form.alamat, jenis_motor: form.jenis_motor,
       });
       if (form.newPassword && form.oldPassword) {
         await api.put(`/users/${user.id_user}/change-password`, {
-          oldPassword: form.oldPassword,
-          newPassword: form.newPassword,
+          oldPassword: form.oldPassword, newPassword: form.newPassword,
         });
       }
-      const updatedUser = {
-        ...user,
-        ...response.data.data,
-        foto: user.foto,
-      };
+      const updatedUser = { ...user, ...res.data.data, foto: user.foto };
       setUser(updatedUser);
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
       showModal('success', 'Berhasil!', 'Profil berhasil diperbarui!');
       setEditMode(false);
-      setForm({
-        ...form,
-        oldPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
-      });
-    } catch (error: any) {
-      console.error('Update error:', error.response?.data);
-      showModal('error', 'Gagal', error.response?.data?.message || 'Terjadi kesalahan saat menyimpan profil');
-    } finally {
-      setSaving(false);
-    }
+      setForm({ ...form, oldPassword: '', newPassword: '', confirmNewPassword: '' });
+    } catch (e: any) {
+      showModal('error', 'Gagal', e.response?.data?.message || 'Terjadi kesalahan saat menyimpan profil');
+    } finally { setSaving(false); }
   };
 
-  const handleLogout = () => {
-    setLogoutModalVisible(true);
-  };
+  const handleLogout  = () => setLogoutModalVisible(true);
 
   const confirmLogout = async () => {
     setLogoutModalVisible(false);
     try {
-      // Coba panggil logout backend (jika ada endpoint)
-      await AuthService.logout().catch(() => console.log('Logout backend gagal, lanjut clear local'));
-
-      // Clear local storage
+      await AuthService.logout().catch(() => {});
       await AsyncStorage.multiRemove(['token', 'user']);
       delete api.defaults.headers.common['Authorization'];
-
       showModal('success', 'Logout Berhasil', 'Anda telah keluar dari akun.');
-
       setTimeout(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainApp' }], // Reset ke root level (AppNavigator akan ke AuthStack)
-        });
+        navigation.reset({ index: 0, routes: [{ name: 'MainApp' }] });
       }, 1500);
-    } catch (error) {
-      showModal('error', 'Gagal Logout', 'Terjadi kesalahan. Coba lagi.');
-    }
+    } catch { showModal('error', 'Gagal Logout', 'Terjadi kesalahan. Coba lagi.'); }
   };
 
   const selectMotor = (value: string) => {
@@ -246,84 +185,114 @@ const ProfileScreen = () => {
     setMotorModalVisible(false);
   };
 
+  // ── Inisial avatar ──────────────────────────────────────────────────────────
+  const initials = user?.nama
+    ? user.nama.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()
+    : 'U';
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Avatar */}
-        <View style={styles.avatarContainer}>
-          <Image
-            source={
-              user?.foto
-                ? {
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+
+        {/* ── HEADER (sama pola DashboardScreen) ─────────────────────────── */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.title}>VESPA EXPERT</Text>
+            <Text style={styles.subtitle}>Profil Pengguna</Text>
+          </View>
+          <TouchableOpacity onPress={() => setEditMode(!editMode)}>
+            <MaterialCommunityIcons
+              name={editMode ? 'check' : 'pencil'}
+              size={24}
+              color={PRIMARY}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* ── PROFILE CARD (sama pola profileCard Dashboard) ─────────────── */}
+        <View style={styles.profileCard}>
+          <TouchableOpacity onPress={pickImage} style={styles.avatarWrap}>
+            {user?.foto ? (
+              <Image
+                source={{
                   uri: user.foto.startsWith('http')
                     ? user.foto
-                    : `${BASE_URL}/storage/${user.foto}`
-                }
-                : require('../../assets/ava.png')
-            }
-            style={styles.avatarImage}
-            resizeMode="cover"
-          />
-          <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
-            <MaterialCommunityIcons name="camera" size={28} color="#fff" />
+                    : `${BASE_URL}/storage/${user.foto}`,
+                }}
+                style={styles.avatarImage}
+              />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <Text style={styles.avatarInitials}>{initials}</Text>
+              </View>
+            )}
+            <View style={styles.cameraIcon}>
+              <MaterialCommunityIcons name="camera" size={14} color="#fff" />
+            </View>
           </TouchableOpacity>
+
+          <View style={{ marginLeft: 12, flex: 1 }}>
+            <Text style={styles.profileName}>
+              {user?.nama?.toUpperCase() || 'PENGGUNA'}
+            </Text>
+            <Text style={styles.profileDesc}>
+              {user?.jenis_motor || 'Belum memilih motor'}
+            </Text>
+            <Text style={styles.profileEmail}>{user?.email || ''}</Text>
+          </View>
         </View>
 
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Profil Pengguna</Text>
-          <TouchableOpacity onPress={() => setEditMode(!editMode)}>
-            <MaterialCommunityIcons name={editMode ? 'check' : 'pencil'} size={28} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Data Pribadi */}
+        {/* ── DATA PRIBADI ─────────────────────────────────────────────────── */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Data Pribadi</Text>
+
           <Text style={styles.label}>Email</Text>
           <Text style={styles.value}>{user?.email || '-'}</Text>
+
           <Text style={styles.label}>Nama</Text>
           {editMode ? (
             <TextInput
               style={styles.input}
               value={form.nama}
-              onChangeText={(text) => setForm({ ...form, nama: text })}
+              onChangeText={(t) => setForm({ ...form, nama: t })}
               placeholder="Masukkan nama"
-              placeholderTextColor="#777"
+              placeholderTextColor={TEXT_SUB}
             />
           ) : (
             <Text style={styles.value}>{user?.nama || '-'}</Text>
           )}
+
           <Text style={styles.label}>No HP</Text>
           {editMode ? (
             <TextInput
               style={styles.input}
               value={form.no_hp}
-              onChangeText={(text) => setForm({ ...form, no_hp: text })}
+              onChangeText={(t) => setForm({ ...form, no_hp: t })}
               keyboardType="phone-pad"
               placeholder="Masukkan nomor HP"
-              placeholderTextColor="#777"
+              placeholderTextColor={TEXT_SUB}
             />
           ) : (
             <Text style={styles.value}>{user?.no_hp || '-'}</Text>
           )}
+
           <Text style={styles.label}>Alamat</Text>
           {editMode ? (
             <TextInput
               style={[styles.input, styles.textArea]}
               value={form.alamat}
-              onChangeText={(text) => setForm({ ...form, alamat: text })}
+              onChangeText={(t) => setForm({ ...form, alamat: t })}
               multiline
               numberOfLines={3}
               placeholder="Masukkan alamat"
-              placeholderTextColor="#777"
+              placeholderTextColor={TEXT_SUB}
             />
           ) : (
             <Text style={styles.value}>{user?.alamat || '-'}</Text>
           )}
         </View>
 
-        {/* Jenis Motor */}
+        {/* ── JENIS MOTOR ──────────────────────────────────────────────────── */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Jenis Motor</Text>
           {editMode ? (
@@ -331,223 +300,190 @@ const ProfileScreen = () => {
               style={styles.customPicker}
               onPress={() => setMotorModalVisible(true)}
             >
-              <Text style={styles.pickerText}>
+              <Text style={[styles.pickerText, !form.jenis_motor && { color: TEXT_SUB }]}>
                 {form.jenis_motor || 'Pilih Jenis Motor'}
               </Text>
-              <MaterialCommunityIcons name="chevron-down" size={24} color={GOLD} />
+              <MaterialCommunityIcons name="chevron-down" size={22} color={PRIMARY} />
             </TouchableOpacity>
           ) : (
-            <Text style={styles.value}>
-              {user?.jenis_motor
-                ? MOTOR_OPTIONS.find(opt => opt.value === user.jenis_motor)?.label || user.jenis_motor
-                : 'Belum dipilih'}
-            </Text>
+            <View style={styles.row}>
+              <MaterialCommunityIcons name="scooter" size={18} color={PRIMARY} />
+              <Text style={[styles.value, { marginLeft: 8 }]}>
+                {user?.jenis_motor
+                  ? MOTOR_OPTIONS.find(o => o.value === user.jenis_motor)?.label || user.jenis_motor
+                  : 'Belum dipilih'}
+              </Text>
+            </View>
           )}
         </View>
 
-        {/* Modal Pilih Motor */}
-        <Modal
-          visible={motorModalVisible}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setMotorModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Pilih Jenis Motor</Text>
-              <FlatList
-                data={MOTOR_OPTIONS}
-                keyExtractor={(item) => item.value}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.modalItem,
-                      form.jenis_motor === item.value && { backgroundColor: '#333' },
-                    ]}
-                    onPress={() => selectMotor(item.value)}
-                  >
-                    <MaterialCommunityIcons name={item.icon} size={24} color={GOLD} style={{ marginRight: 12 }} />
-                    <Text style={styles.modalItemText}>{item.label}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-              <TouchableOpacity
-                style={styles.modalClose}
-                onPress={() => setMotorModalVisible(false)}
-              >
-                <Text style={styles.modalCloseText}>Batal</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Ganti Password */}
+        {/* ── GANTI PASSWORD (edit mode saja) ─────────────────────────────── */}
         {editMode && (
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>Ganti Password</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Password Lama"
-                placeholderTextColor="#777"
-                secureTextEntry={!showOldPassword}
-                value={form.oldPassword}
-                onChangeText={(text) => setForm({ ...form, oldPassword: text })}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowOldPassword(!showOldPassword)}
-              >
-                <MaterialCommunityIcons
-                  name={showOldPassword ? 'eye' : 'eye-off'}
-                  size={20}
-                  color="#777"
+
+            {[
+              { key: 'oldPassword',         label: 'Password Lama',             show: showOldPassword,     toggle: setShowOldPassword },
+              { key: 'newPassword',          label: 'Password Baru',             show: showNewPassword,     toggle: setShowNewPassword },
+              { key: 'confirmNewPassword',   label: 'Konfirmasi Password Baru',  show: showConfirmPassword, toggle: setShowConfirmPassword },
+            ].map(({ key, label, show, toggle }) => (
+              <View key={key} style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder={label}
+                  placeholderTextColor={TEXT_SUB}
+                  secureTextEntry={!show}
+                  value={(form as any)[key]}
+                  onChangeText={(t) => setForm({ ...form, [key]: t })}
                 />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Password Baru"
-                placeholderTextColor="#777"
-                secureTextEntry={!showNewPassword}
-                value={form.newPassword}
-                onChangeText={(text) => setForm({ ...form, newPassword: text })}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowNewPassword(!showNewPassword)}
-              >
-                <MaterialCommunityIcons
-                  name={showNewPassword ? 'eye' : 'eye-off'}
-                  size={20}
-                  color="#777"
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Konfirmasi Password Baru"
-                placeholderTextColor="#777"
-                secureTextEntry={!showConfirmPassword}
-                value={form.confirmNewPassword}
-                onChangeText={(text) => setForm({ ...form, confirmNewPassword: text })}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <MaterialCommunityIcons
-                  name={showConfirmPassword ? 'eye' : 'eye-off'}
-                  size={20}
-                  color="#777"
-                />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity style={styles.eyeIcon} onPress={() => toggle(!show)}>
+                  <MaterialCommunityIcons name={show ? 'eye' : 'eye-off'} size={18} color={TEXT_SUB} />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
         )}
 
-        {/* Tombol Simpan */}
+        {/* ── TOMBOL SIMPAN ────────────────────────────────────────────────── */}
         {editMode && (
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving || loading}>
-            {saving ? (
-              <ActivityIndicator size="small" color="#000" />
-            ) : (
-              <Text style={styles.saveText}>Simpan Perubahan</Text>
-            )}
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSave}
+            disabled={saving || loading}
+          >
+            {saving
+              ? <ActivityIndicator size="small" color="#fff" />
+              : <Text style={styles.saveText}>Simpan Perubahan</Text>
+            }
           </TouchableOpacity>
         )}
 
-        {/* Logout */}
+        {/* ── LOGOUT ───────────────────────────────────────────────────────── */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+          <MaterialCommunityIcons name="logout" size={20} color={DANGER} />
           <Text style={styles.logoutText}>Keluar dari Akun</Text>
         </TouchableOpacity>
+
+        <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Modal Konfirmasi Simpan */}
+      {/* ── MODAL: Pilih Motor ──────────────────────────────────────────────── */}
+      <Modal
+        visible={motorModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setMotorModalVisible(false)}
+      >
+        <View style={styles.sheetOverlay}>
+          <View style={styles.sheetContent}>
+            <Text style={styles.sheetTitle}>Pilih Jenis Motor</Text>
+            <FlatList
+              data={MOTOR_OPTIONS}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.sheetItem,
+                    form.jenis_motor === item.value && styles.sheetItemActive,
+                  ]}
+                  onPress={() => selectMotor(item.value)}
+                >
+                  <MaterialCommunityIcons name={item.icon} size={20} color={PRIMARY} style={{ marginRight: 12 }} />
+                  <Text style={styles.sheetItemText}>{item.label}</Text>
+                  {form.jenis_motor === item.value && (
+                    <MaterialCommunityIcons name="check" size={18} color={PRIMARY} style={{ marginLeft: 'auto' }} />
+                  )}
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity style={styles.sheetClose} onPress={() => setMotorModalVisible(false)}>
+              <Text style={styles.sheetCloseText}>Batal</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── MODAL: Konfirmasi Simpan ─────────────────────────────────────────── */}
       <Modal
         visible={confirmModalVisible}
         transparent
         animationType="fade"
         onRequestClose={() => setConfirmModalVisible(false)}
       >
-        <View style={styles.confirmModalOverlay}>
-          <Animated.View style={[styles.confirmModalContent, { opacity: fadeAnim }]}>
-            <MaterialCommunityIcons name="content-save-check" size={48} color={GOLD} style={{ marginBottom: 16 }} />
-            <Text style={styles.confirmModalTitle}>Simpan Perubahan?</Text>
-            <Text style={styles.confirmModalText}>
-              Pastikan semua data sudah benar sebelum menyimpan.
-            </Text>
-            <View style={styles.confirmModalButtons}>
+        <View style={styles.centerOverlay}>
+          <Animated.View style={[styles.centerModal, { opacity: fadeAnim }]}>
+            <View style={styles.modalIconWrap}>
+              <MaterialCommunityIcons name="content-save-check" size={32} color={PRIMARY} />
+            </View>
+            <Text style={styles.modalTitle}>Simpan Perubahan?</Text>
+            <Text style={styles.modalDesc}>Pastikan semua data sudah benar sebelum menyimpan.</Text>
+            <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalBtn, styles.modalBtnCancel]}
                 onPress={() => setConfirmModalVisible(false)}
               >
-                <Text style={styles.modalButtonText}>Batal</Text>
+                <Text style={styles.modalBtnCancelText}>Batal</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.confirmButton]}
-                onPress={confirmSave}
-              >
-                <Text style={styles.modalButtonTextConfirm}>Ya, Simpan</Text>
+              <TouchableOpacity style={[styles.modalBtn, styles.modalBtnConfirm]} onPress={confirmSave}>
+                <Text style={styles.modalBtnConfirmText}>Ya, Simpan</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
         </View>
       </Modal>
 
-      {/* Modal Sukses Update */}
+      {/* ── MODAL: Sukses ────────────────────────────────────────────────────── */}
       <Modal
         visible={successModalVisible}
         transparent
         animationType="fade"
         onRequestClose={() => setSuccessModalVisible(false)}
       >
-        <View style={styles.confirmModalOverlay}>
-          <Animated.View style={[styles.confirmModalContent, { opacity: fadeAnim }]}>
-            <MaterialCommunityIcons name="check-circle" size={64} color={GOLD} style={{ marginBottom: 16 }} />
-            <Text style={styles.confirmModalTitle}>Berhasil!</Text>
-            <Text style={styles.confirmModalText}>
-              Profil Anda sudah berhasil diperbarui.
-            </Text>
+        <View style={styles.centerOverlay}>
+          <Animated.View style={[styles.centerModal, { opacity: fadeAnim }]}>
+            <View style={[styles.modalIconWrap, { backgroundColor: '#ECFDF5' }]}>
+              <MaterialCommunityIcons name="check-circle" size={32} color="#10B981" />
+            </View>
+            <Text style={styles.modalTitle}>Berhasil!</Text>
+            <Text style={styles.modalDesc}>{modalMessage}</Text>
             <TouchableOpacity
-              style={[styles.modalButton, styles.confirmButton]}
+              style={[styles.modalBtn, styles.modalBtnConfirm, { flex: 1 }]}
               onPress={() => setSuccessModalVisible(false)}
             >
-              <Text style={styles.modalButtonTextConfirm}>OK</Text>
+              <Text style={styles.modalBtnConfirmText}>OK</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
       </Modal>
 
-      {/* Modal Konfirmasi Logout */}
+      {/* ── MODAL: Konfirmasi Logout ─────────────────────────────────────────── */}
       <Modal
         visible={logoutModalVisible}
         transparent
         animationType="fade"
         onRequestClose={() => setLogoutModalVisible(false)}
       >
-        <View style={styles.logoutModalOverlay}>
-          <View style={styles.logoutModalContent}>
-            <MaterialCommunityIcons name="logout" size={48} color={GOLD} style={{ marginBottom: 16 }} />
-            <Text style={styles.logoutModalTitle}>Keluar dari Akun?</Text>
-            <Text style={styles.logoutModalText}>
+        <View style={styles.centerOverlay}>
+          <View style={styles.centerModal}>
+            <View style={[styles.modalIconWrap, { backgroundColor: '#FEF2F2' }]}>
+              <MaterialCommunityIcons name="logout" size={32} color={DANGER} />
+            </View>
+            <Text style={styles.modalTitle}>Keluar dari Akun?</Text>
+            <Text style={styles.modalDesc}>
               Anda akan keluar dan harus login kembali untuk menggunakan aplikasi.
             </Text>
-            <View style={styles.logoutModalButtons}>
+            <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalBtn, styles.modalBtnCancel]}
                 onPress={() => setLogoutModalVisible(false)}
               >
-                <Text style={styles.modalButtonText}>Batal</Text>
+                <Text style={styles.modalBtnCancelText}>Batal</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.confirmButton]}
+                style={[styles.modalBtn, { backgroundColor: DANGER, flex: 1 }]}
                 onPress={confirmLogout}
               >
-                <Text style={styles.modalButtonTextConfirm}>Keluar</Text>
+                <Text style={styles.modalBtnConfirmText}>Keluar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -557,258 +493,314 @@ const ProfileScreen = () => {
   );
 };
 
+export default ProfileScreen;
+
+// ── StyleSheet ─────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    backgroundColor: '#0E0E0E',
-    padding: 20,
+    flex: 1,
+    backgroundColor: BG,
   },
-  avatarContainer: {
-    alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 10,
-  },
-  avatarImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 2,
-    borderColor: GOLD,
-    backgroundColor: '#1F1F1F',
-  },
-  cameraIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 80,
-    backgroundColor: GOLD,
-    padding: 8,
-    borderRadius: 20,
-  },
+
+  // Header — sama pola Dashboard
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
     marginBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: BORDER,
   },
   title: {
-    fontSize: 24,
+    color: TEXT_MAIN,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#fff',
   },
-  sectionCard: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 16,
+  subtitle: {
+    color: TEXT_SUB,
+    fontSize: 12,
+  },
+
+  // Profile card — sama pola profileCard Dashboard
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: CARD,
+    marginHorizontal: 20,
     padding: 15,
-    marginBottom: 15,
+    borderRadius: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: PRIMARY,
+  },
+  avatarWrap: {
+    position: 'relative',
+  },
+  avatarImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2,
+    borderColor: BORDER,
+  },
+  avatarFallback: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 2,
+    borderColor: PRIMARY,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitials: {
+    color: PRIMARY,
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  cameraIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: -2,
+    backgroundColor: PRIMARY,
+    padding: 4,
+    borderRadius: 10,
+  },
+  profileName: {
+    color: TEXT_MAIN,
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  profileDesc: {
+    color: TEXT_SUB,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  profileEmail: {
+    color: PRIMARY,
+    fontSize: 11,
+    marginTop: 2,
+  },
+
+  // Section cards
+  sectionCard: {
+    backgroundColor: CARD,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 20,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: GOLD,
-    marginBottom: 10,
+    fontSize: 14,
+    fontWeight: '700',
+    color: PRIMARY,
+    marginBottom: 12,
   },
   label: {
-    fontSize: 13,
-    color: '#888',
-    marginBottom: 6,
-    marginTop: 10,
+    fontSize: 12,
+    color: TEXT_SUB,
+    marginBottom: 4,
+    marginTop: 8,
   },
   value: {
-    fontSize: 16,
-    color: '#fff',
+    fontSize: 15,
+    color: TEXT_MAIN,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderColor: BORDER,
   },
   input: {
-    backgroundColor: '#252525',
-    borderRadius: 12,
+    backgroundColor: BG,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: '#fff',
-    marginBottom: 10,
+    color: TEXT_MAIN,
+    fontSize: 14,
+    marginBottom: 8,
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
   },
-  saveButton: {
-    backgroundColor: GOLD,
-    padding: 15,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  saveText: {
-    fontWeight: '700',
-    color: '#000',
-    fontSize: 16,
-  },
-  logoutButton: {
-    borderWidth: 1.5,
-    borderColor: GOLD,
-    padding: 15,
-    borderRadius: 20,
-    alignItems: 'center',
+  row: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: 'center',
   },
-  logoutText: {
-    color: GOLD,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  passwordContainer: {
-    position: 'relative',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 15,
-    top: 25,
-  },
+
+  // Picker
   customPicker: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#252525',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginTop: 8,
+    backgroundColor: BG,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginTop: 4,
   },
   pickerText: {
-    color: '#fff',
-    fontSize: 16,
+    color: TEXT_MAIN,
+    fontSize: 14,
   },
-  modalOverlay: {
+
+  // Password
+  passwordContainer: { position: 'relative' },
+  eyeIcon: { position: 'absolute', right: 12, top: 26 },
+
+  // Buttons
+  saveButton: {
+    backgroundColor: PRIMARY,
+    marginHorizontal: 20,
+    padding: 15,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  saveText: {
+    fontWeight: '700',
+    color: '#fff',
+    fontSize: 15,
+  },
+  logoutButton: {
+    marginHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 20,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: DANGER,
+  },
+  logoutText: {
+    color: DANGER,
+    fontSize: 15,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+
+  // Bottom sheet modal (Motor)
+  sheetOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
-  modalContent: {
-    backgroundColor: '#1A1A1A',
+  sheetContent: {
+    backgroundColor: BG,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
     maxHeight: '70%',
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: GOLD,
-    marginBottom: 16,
+  sheetTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: TEXT_MAIN,
+    marginBottom: 14,
     textAlign: 'center',
   },
-  modalItem: {
+  sheetItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  modalItemText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  modalClose: {
-    marginTop: 20,
     paddingVertical: 14,
-    backgroundColor: '#333',
-    borderRadius: 12,
-    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
   },
-  modalCloseText: {
-    color: '#fff',
-    fontSize: 16,
+  sheetItemActive: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+  },
+  sheetItemText: {
+    color: TEXT_MAIN,
+    fontSize: 15,
+  },
+  sheetClose: {
+    marginTop: 14,
+    paddingVertical: 14,
+    backgroundColor: CARD,
+    borderRadius: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  sheetCloseText: {
+    color: TEXT_MAIN,
+    fontSize: 15,
     fontWeight: '600',
   },
-  logoutModalOverlay: {
+
+  // Center modal (confirm, success, logout)
+  centerOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoutModalContent: {
-    backgroundColor: '#1A1A1A',
+  centerModal: {
+    backgroundColor: BG,
     borderRadius: 20,
-    padding: 24,
-    width: '80%',
+    padding: 28,
+    width: '82%',
     alignItems: 'center',
   },
-  logoutModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 12,
+  modalIconWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
-  logoutModalText: {
-    fontSize: 14,
-    color: '#aaa',
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: TEXT_MAIN,
+    marginBottom: 8,
+  },
+  modalDesc: {
+    fontSize: 13,
+    color: TEXT_SUB,
     textAlign: 'center',
     marginBottom: 24,
+    lineHeight: 20,
   },
-  logoutModalButtons: {
+  modalButtons: {
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'space-between',
+    gap: 10,
   },
-  modalButton: {
+  modalBtn: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 12,
-    marginHorizontal: 8,
     alignItems: 'center',
   },
-  cancelButton: {
-    backgroundColor: '#333',
+  modalBtnCancel: {
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
-  confirmButton: {
-    backgroundColor: GOLD,
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  modalBtnCancelText: {
+    color: TEXT_MAIN,
+    fontSize: 14,
     fontWeight: '600',
   },
-  modalButtonTextConfirm: {
-    color: '#000',
-    fontSize: 16,
+  modalBtnConfirm: {
+    backgroundColor: PRIMARY,
+  },
+  modalBtnConfirmText: {
+    color: '#fff',
+    fontSize: 14,
     fontWeight: '700',
   },
-  // Modal Konfirmasi Simpan
-  confirmModalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  confirmModalContent: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 20,
-    padding: 32,
-    width: '80%',
-    alignItems: 'center',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-  },
-  confirmModalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 12,
-  },
-  confirmModalText: {
-    fontSize: 15,
-    color: '#ccc',
-    textAlign: 'center',
-    marginBottom: 28,
-  },
-  confirmModalButtons: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-  },
 });
-
-export default ProfileScreen;

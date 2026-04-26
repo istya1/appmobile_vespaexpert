@@ -13,9 +13,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import VespaPediaService, { VespaPediaItem } from '../services/vespa-pedia-service';
 import DashboardFooter from '../components/footer';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type RootStackParamList = {
   VespaDetail: { jenisMotor: string };
@@ -24,7 +24,12 @@ type RootStackParamList = {
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 const { width } = Dimensions.get('window');
 
-const GOLD = '#D4AF37';
+const PRIMARY = '#4A90E2';
+const BACKGROUND = '#F9FAFB';
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
 
 const VespaPediaScreen = () => {
   const navigation = useNavigation<NavProp>();
@@ -92,7 +97,7 @@ const VespaPediaScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={GOLD} />
+        <ActivityIndicator size="large" color={PRIMARY} />
         <Text style={styles.loadingText}>Memuat data Vespa...</Text>
       </View>
     );
@@ -102,6 +107,9 @@ const VespaPediaScreen = () => {
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color={PRIMARY} />
+        </TouchableOpacity>
         <Text style={styles.title}>VESPA PEDIA</Text>
         <Text style={styles.subtitle}>Informasi tentang tipe vespa</Text>
       </View>
@@ -123,7 +131,7 @@ const VespaPediaScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={GOLD} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={PRIMARY} />
         }
       >
         {filteredVespa.map((vespa) => (
@@ -201,51 +209,51 @@ export default VespaPediaScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0E0E0E',
+    backgroundColor: BACKGROUND,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0E0E0E',
+    backgroundColor: BACKGROUND,
   },
   loadingText: {
-    color: '#999',
+    color: SUBTEXT,
     marginTop: 10,
     fontSize: 14,
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 30,
     paddingBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
+    color: TEXT,
     letterSpacing: 1,
   },
   subtitle: {
     fontSize: 12,
-    color: GOLD,
+    color: PRIMARY,
     marginTop: 4,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F1F1F',
+    backgroundColor: CARD,
     marginHorizontal: 20,
     paddingHorizontal: 15,
     paddingVertical: 2,
     borderRadius: 25,
     marginBottom: 30,
     borderWidth: 1,
-    borderColor: GOLD,
+    borderColor: BORDER,
   },
   searchInput: {
     flex: 1,
     marginLeft: 10,
-    color: '#fff',
+    color: TEXT,
     fontSize: 14,
   },
   scrollContent: {
@@ -253,7 +261,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   card: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: CARD,
     borderRadius: 20,
     marginBottom: 20,
     overflow: 'hidden',
@@ -263,7 +271,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     borderWidth: 1,
-    borderColor: GOLD,
+    borderColor: BORDER,
   },
   vespaImage: {
     width: '100%',
@@ -272,7 +280,7 @@ const styles = StyleSheet.create({
   noImageContainer: {
     width: '100%',
     height: 200,
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -287,7 +295,7 @@ const styles = StyleSheet.create({
   vespaName: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+    color: TEXT,
     marginTop: 2,
     zIndex: 10,
   },
@@ -306,24 +314,24 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 12,
-    color: '#999',
+    color: SUBTEXT,
   },
   infoValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: GOLD,
+    color: PRIMARY,
     marginTop: 2,
   },
   description: {
     fontSize: 13,
-    color: '#aaa',
+    color: SUBTEXT,
     lineHeight: 20,
     marginBottom: 12,
   },
   featureTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#fff',
+    color: TEXT,
     marginBottom: 8,
   },
   featureContainer: {
@@ -332,16 +340,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   featureBadge: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: GOLD,
+    borderColor: PRIMARY,
   },
   featureText: {
     fontSize: 11,
-    color: GOLD,
+    color: PRIMARY,
     fontWeight: '500',
   },
   emptyContainer: {
@@ -351,7 +359,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#555',
+    color: SUBTEXT,
     marginTop: 15,
   },
 });

@@ -14,7 +14,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import VespaPediaService, { VespaPediaItem } from '../services/vespa-pedia-service';
 
 const { width } = Dimensions.get('window');
-const GOLD = '#D4AF37';
+const PRIMARY = '#4A90E2';
+const BACKGROUND = '#F9FAFB';
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
 
 const VespaDetailScreen = () => {
     const navigation = useNavigation();
@@ -55,7 +60,7 @@ const VespaDetailScreen = () => {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={GOLD} />
+                <ActivityIndicator size="large" color={TEXT} />
                 <Text style={styles.loadingText}>Memuat detail...</Text>
             </View>
         );
@@ -66,7 +71,7 @@ const VespaDetailScreen = () => {
             {/* HEADER */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+                    <MaterialCommunityIcons name="arrow-left" size={24} color={TEXT} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Detail Vespa</Text>
                 <View style={{ width: 24 }} />
@@ -120,7 +125,7 @@ const VespaDetailScreen = () => {
                             <Text style={styles.sectionTitle}>Keunggulan</Text>
                             {groupedData['Keunggulan'].map((item) => (
                                 <View key={item.id} style={styles.featureCard}>
-                                    <MaterialCommunityIcons name="check-circle" size={20} color={GOLD} />
+                                    <MaterialCommunityIcons name="check-circle" size={20} color={PRIMARY} />
                                     <View style={{ flex: 1, marginLeft: 12 }}>
                                         <Text style={styles.featureTitle}>{item.judul}</Text>
                                         <Text style={styles.featureContent}>{item.konten}</Text>
@@ -136,7 +141,7 @@ const VespaDetailScreen = () => {
                             <Text style={styles.sectionTitle}>Tips</Text>
                             {groupedData['Tips'].map((item) => (
                                 <View key={item.id} style={styles.tipCard}>
-                                    <MaterialCommunityIcons name="lightbulb-outline" size={20} color={GOLD} />
+                                    <MaterialCommunityIcons name="lightbulb-outline" size={20} color={PRIMARY} />
                                     <View style={{ flex: 1, marginLeft: 12 }}>
                                         <Text style={styles.tipTitle}>{item.judul}</Text>
                                         <Text style={styles.tipContent}>{item.konten}</Text>
@@ -156,16 +161,16 @@ export default VespaDetailScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0E0E0E',
+        backgroundColor: BACKGROUND,
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#0E0E0E',
+        backgroundColor: BACKGROUND,
     },
     loadingText: {
-        color: '#999',
+        color: SUBTEXT,
         marginTop: 10,
     },
     header: {
@@ -173,9 +178,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 50,
+        paddingTop: 30,
         paddingBottom: 15,
-        backgroundColor: '#0E0E0E',
+        backgroundColor: CARD,
+        borderBottomColor: BORDER,
+        borderBottomWidth: 1,
     },
     backButton: {
         width: 40,
@@ -186,7 +193,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#fff',
+        color: TEXT,
     },
     imageContainer: {
         width: '100%',
@@ -199,7 +206,7 @@ const styles = StyleSheet.create({
     },
     imageOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        backgroundColor: 'rgba(0,0,0,0.05)',
     },
     content: {
         padding: 20,
@@ -207,7 +214,7 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 28,
         fontWeight: '700',
-        color: '#fff',
+        color: TEXT,
         marginBottom: 20,
     },
     section: {
@@ -216,72 +223,76 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#fff',
+        color: TEXT,
         marginBottom: 15,
     },
     description: {
         fontSize: 14,
-        color: '#aaa',
+        color: SUBTEXT,
         lineHeight: 22,
         marginBottom: 10,
     },
     specCard: {
-        backgroundColor: '#1A1A1A',
+        backgroundColor: CARD,
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
         borderLeftWidth: 3,
-        borderLeftColor: GOLD,
+        borderLeftColor: PRIMARY,
+        borderWidth: 1,
+        borderColor: BORDER,
     },
     specTitle: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#fff',
+        color: TEXT,
         marginBottom: 8,
     },
     specContent: {
         fontSize: 13,
-        color: '#bbb',
+        color: SUBTEXT,
         lineHeight: 20,
     },
     featureCard: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        backgroundColor: '#1A1A1A',
+        backgroundColor: CARD,
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
+        borderWidth: 1,
+        borderColor: BORDER,
     },
     featureTitle: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#fff',
+        color: TEXT,
         marginBottom: 6,
     },
     featureContent: {
         fontSize: 13,
-        color: '#bbb',
+        color: SUBTEXT,
         lineHeight: 20,
     },
     tipCard: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        backgroundColor: '#1A1A1A',
+        backgroundColor: '#EFF6FF',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#2A2A2A',
+        borderColor: PRIMARY,
     },
     tipTitle: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#fff',
+        color: TEXT,
         marginBottom: 6,
     },
     tipContent: {
         fontSize: 13,
-        color: '#bbb',
+        color: SUBTEXT,
         lineHeight: 20,
     },
 });

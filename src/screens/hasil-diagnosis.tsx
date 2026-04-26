@@ -7,6 +7,13 @@ import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { simpanRiwayatDiagnosis } from '../services/api';
 import { HasilDiagnosisFinal, AturanKandidat } from '../services/api';
 
+const PRIMARY = '#4A90E2';
+const BACKGROUND = '#F9FAFB';
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
+
 const HasilDiagnosis = () => {
   const route = useRoute<RouteProp<any>>();
   const navigation = useNavigation<any>();
@@ -197,38 +204,46 @@ const HasilDiagnosis = () => {
 export default HasilDiagnosis;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0A' },
+  container: { flex: 1, backgroundColor: BACKGROUND  },
   content: { padding: 20, paddingBottom: 40 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0A0A0A' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: BACKGROUND },
   emptyText: { color: '#666666', fontSize: 15 },
   header: { marginBottom: 24 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#FFFFFF', letterSpacing: 1 },
-  subtitle: { fontSize: 14, color: '#D4AF37', marginTop: 4, letterSpacing: 0.5 },
+  title: { fontSize: 28, fontWeight: 'bold', color: TEXT, letterSpacing: 1 },
+  subtitle: { fontSize: 14, color: PRIMARY, marginTop: 4, letterSpacing: 0.5 },
   savingBadge: { flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 },
-  savingText: { color: '#888888', fontSize: 12 },
+  savingText: { color: SUBTEXT , fontSize: 12 },
   savedBadge: { marginTop: 8 },
-  savedText: { color: '#4CAF50', fontSize: 12 },
-  sectionLabel: { fontSize: 13, fontWeight: '700', color: '#999999', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12, marginTop: 8 },
-  sectionHint: { fontSize: 12, color: '#555555', marginBottom: 12, marginTop: -8 },
-  cardFinal: { backgroundColor: '#1A1A1A', borderRadius: 14, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: '#D4AF37' },
+  savedText: { color: PRIMARY, fontSize: 12 },
+  sectionLabel: { fontSize: 13, fontWeight: '700', color: SUBTEXT, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12, marginTop: 8 },
+  sectionHint: { fontSize: 12, color: SUBTEXT, marginBottom: 12, marginTop: -8 },
+ cardFinal: {
+  backgroundColor: CARD,
+  borderRadius: 14,
+  padding: 18,
+  marginBottom: 14,
+  borderWidth: 1,
+  borderColor: PRIMARY,
+},
+
   cardTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  kode: { color: '#D4AF37', fontWeight: 'bold', fontSize: 13, letterSpacing: 1 },
-  matchBadge: { backgroundColor: '#D4AF37', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 20 },
-  matchBadgeText: { color: '#000000', fontWeight: 'bold', fontSize: 12 },
-  nama: { fontSize: 17, fontWeight: '600', color: '#FFFFFF', marginBottom: 4 },
-  divider: { height: 1, backgroundColor: '#2A2A2A', marginVertical: 12 },
+  kode: { color: PRIMARY, fontWeight: 'bold', fontSize: 13, letterSpacing: 1 },
+  matchBadge: { backgroundColor: PRIMARY, paddingHorizontal: 10, paddingVertical: 3, borderRadius: 20 },
+  matchBadgeText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
+  nama: { fontSize: 17, fontWeight: '600', color: TEXT, marginBottom: 4 },
+  divider: { height: 1, backgroundColor: BORDER, marginVertical: 12 },
   solusiTitle: { fontSize: 12, color: '#888888', fontWeight: '600', letterSpacing: 0.5, marginBottom: 6, textTransform: 'uppercase' },
-  solusi: { fontSize: 14, color: '#CCCCCC', lineHeight: 22 },
-  noResultBox: { backgroundColor: '#1A1A1A', borderRadius: 12, padding: 24, alignItems: 'center', marginBottom: 20 },
-  noResultText: { color: '#666666', fontSize: 15, textAlign: 'center' },
-  cardKandidat: { backgroundColor: '#111111', borderRadius: 14, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#2A2A2A', borderLeftWidth: 3, borderLeftColor: '#D4AF3780' },
-  kodeKandidat: { color: '#888888', fontWeight: 'bold', fontSize: 12, letterSpacing: 1 },
-  matchBadgeKandidat: { borderWidth: 1, borderColor: '#D4AF37', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 },
-  matchBadgeTextKandidat: { color: '#D4AF37', fontSize: 12, fontWeight: '600' },
-  namaKandidat: { fontSize: 15, fontWeight: '600', color: '#AAAAAA', marginBottom: 6 },
+  solusi: { fontSize: 14, color: SUBTEXT, lineHeight: 22 },
+  noResultBox: { backgroundColor: CARD, borderRadius: 12, padding: 24, alignItems: 'center', marginBottom: 20, borderColor: BORDER },
+  noResultText: { color: SUBTEXT, fontSize: 15, textAlign: 'center' },
+  cardKandidat: { backgroundColor: CARD, borderRadius: 14, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: BORDER, borderLeftWidth: 3, borderLeftColor: PRIMARY },
+  kodeKandidat: { color: SUBTEXT, fontWeight: 'bold', fontSize: 12, letterSpacing: 1 },
+  matchBadgeKandidat: { borderWidth: 1, borderColor: PRIMARY, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 },
+  matchBadgeTextKandidat: { color: PRIMARY, fontSize: 12, fontWeight: '600' },
+  namaKandidat: { fontSize: 15, fontWeight: '600', color: TEXT, marginBottom: 6 },
   progressText: { fontSize: 12, color: '#555555', marginBottom: 10 },
   gejalaBelumLabel: { fontSize: 12, color: '#666666', marginBottom: 6 },
   gejalaBelumItem: { fontSize: 13, color: '#888888', marginBottom: 3, paddingLeft: 4 },
-  riwayatButton: { marginTop: 24, backgroundColor: '#1A1A1A', borderRadius: 12, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: '#333333' },
-  riwayatButtonText: { color: '#D4AF37', fontWeight: '600', fontSize: 14, letterSpacing: 0.5 },
+  riwayatButton: { marginTop: 24, backgroundColor: PRIMARY, borderRadius: 12, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: '#333333' },
+  riwayatButtonText: { color: '#fff', fontWeight: '600', fontSize: 14, letterSpacing: 0.5 },
 });

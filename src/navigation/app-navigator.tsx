@@ -22,7 +22,6 @@ import RiwayatScreen from '../screens/riwayat';
 import ProfileScreen from '../screens/profil';
 import VespaPedia from '../screens/vespa-pedia';
 import VespaSmart from '../screens/vespa-smart';
-import HubungiKami from '../screens/hubungi-kami';
 import VespaCare from '../screens/vespa-care';
 import BengkelScreen from '../screens/bengkel-list';
 import BengkelDetail from '../screens/bengkel-detail';
@@ -79,7 +78,6 @@ const MainStack = () => (
       <Stack.Screen name="VespaPedia" component={VespaPedia} />
       <Stack.Screen name="VespaSmart" component={VespaSmart} />
       <Stack.Screen name="Riwayat" component={RiwayatScreen} />
-      <Stack.Screen name="HubungiKami" component={HubungiKami} />
       <Stack.Screen name="VespaCare" component={VespaCare} />
       <Stack.Screen name="Profil" component={ProfileScreen} />
       <Stack.Screen name="Bengkel" component={BengkelScreen} />

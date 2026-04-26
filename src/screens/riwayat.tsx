@@ -6,6 +6,14 @@ import { useNavigation } from "@react-navigation/native";
 import RiwayatDiagnosa from "./riwayat-diagnosis";
 import RiwayatService from "./riwayat-service";
 
+
+const PRIMARY = '#4A90E2';
+const BACKGROUND = '#F9FAFB';
+const CARD = '#FFFFFF';
+const BORDER = '#E5E7EB';
+const TEXT = '#111827';
+const SUBTEXT = '#6B7280';
+
 export default function RiwayatScreen() {
   const navigation = useNavigation();
   const [tab, setTab] = useState<"diagnosa" | "service">("diagnosa");
@@ -16,7 +24,7 @@ export default function RiwayatScreen() {
       {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#D4AF37" />
+          <Ionicons name="arrow-back" size={24} color={TEXT} />
         </TouchableOpacity>
 
         <View style={{ marginLeft: 12 }}>
@@ -64,31 +72,34 @@ export default function RiwayatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A0A0A",
+    backgroundColor: BACKGROUND,
   },
 
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 30,
-    paddingHorizontal: 10,
-    paddingBottom: 30,
-  },
+  flexDirection: "row",
+  alignItems: "center",
+  paddingTop: 30,
+  paddingHorizontal: 16,
+  paddingBottom: 16,
+  backgroundColor: CARD,
+  borderBottomWidth: 1,
+  borderBottomColor: BORDER,
+},
 
   title: {
     fontSize: 26,
-    color: "#FFFFFF",
+    color: TEXT,
     fontWeight: "bold",
   },
 
   subtitle: {
-    color: "#888",
+    color: SUBTEXT,
     fontSize: 14,
   },
 
   tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#1A1A1A",
+    backgroundColor: "#EEF2FF",
     marginHorizontal: 20,
     borderRadius: 30,
     padding: 4,
@@ -104,15 +115,15 @@ const styles = StyleSheet.create({
   },
 
   tabActive: {
-    backgroundColor: "#D4AF37",
+    backgroundColor: PRIMARY,
   },
 
   tabText: {
-    color: "#888",
+    color: SUBTEXT,
     fontWeight: "600",
   },
 
   tabTextActive: {
-    color: "#000",
+    color: "#FFFFFF",
   },
 });
