@@ -29,7 +29,7 @@ export default function RiwayatScreen() {
 
         <View style={{ marginLeft: 12 }}>
           <Text style={styles.title}>Riwayat</Text>
-          <Text style={styles.subtitle}>Histori Diagnosa & Service</Text>
+          <Text style={styles.subtitle}>Histori Diagnosa & Servis</Text>
         </View>
       </View>
 
@@ -59,7 +59,7 @@ export default function RiwayatScreen() {
               tab === "service" && styles.tabTextActive,
             ]}
           >
-            Service
+            Servis
           </Text>
         </TouchableOpacity>
       </View>

@@ -85,7 +85,7 @@ const DashboardScreen = () => {
         {/* HEADER */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.title}>VESPA EXPERT</Text>
+            <Text style={styles.title}>VESPA MATIC EXPERT</Text>
             <Text style={styles.subtitle}>Aplikasi Vespa Matic</Text>
           </View>
 

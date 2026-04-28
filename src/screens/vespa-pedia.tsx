@@ -39,6 +39,7 @@ const VespaPediaScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+
   useEffect(() => {
     fetchVespaData();
   }, []);
@@ -74,25 +75,28 @@ const VespaPediaScreen = () => {
     fetchVespaData();
   };
 
-  // Extract engine info from konten
   const getEngineInfo = (konten: string) => {
     const ccMatch = konten.match(/(\d+)\s*cc/i);
     return ccMatch ? `${ccMatch[1]}cc i-GET` : '150cc';
   };
 
-  // Extract features from konten
   const extractFeatures = (konten: string) => {
-    const features = [];
-    if (konten.toLowerCase().includes('abs')) features.push('ABS');
-    if (konten.toLowerCase().includes('led')) features.push('LED Lighting');
-    if (konten.toLowerCase().includes('smart')) features.push('Smart Key');
-    if (konten.toLowerCase().includes('usb') || konten.toLowerCase().includes('charging'))
-      features.push('USB Charging');
-    if (konten.toLowerCase().includes('injeksi') || konten.toLowerCase().includes('efi'))
-      features.push('Fuel Injection');
+  const features = [];
 
-    return features.length > 0 ? features : ['Premium Features'];
-  };
+  if (konten.toLowerCase().includes('abs')) features.push('Sistem Rem ABS');
+  if (konten.toLowerCase().includes('led')) features.push('Lampu LED');
+  if (konten.toLowerCase().includes('smart')) features.push('Kunci Pintar (Smart Key)');
+  if (
+    konten.toLowerCase().includes('usb') ||
+    konten.toLowerCase().includes('charging')
+  ) features.push('Pengisian USB');
+  if (
+    konten.toLowerCase().includes('injeksi') ||
+    konten.toLowerCase().includes('efi')
+  ) features.push('Sistem Injeksi');
+
+  return features.length > 0 ? features : ['Fitur Standar'];
+};
 
   if (loading) {
     return (
@@ -141,7 +145,6 @@ const VespaPediaScreen = () => {
             onPress={() => navigation.navigate('VespaDetail', { jenisMotor: vespa.jenis_motor })}
             activeOpacity={0.9}
           >
-
             {vespa.gambar_url ? (
               <Image
                 source={{ uri: vespa.gambar_url }}
@@ -165,7 +168,6 @@ const VespaPediaScreen = () => {
             <View style={styles.cardContent}>
               <View>
                 <Text style={styles.vespaName}>{vespa.judul}</Text>
-                {/* <Text style={styles.vespaYear}>{vespa.jenis_motor}</Text> */}
               </View>
 
               <View style={styles.infoRow}>
@@ -175,9 +177,21 @@ const VespaPediaScreen = () => {
                 </View>
               </View>
 
-              <Text style={styles.description} numberOfLines={3}>
+
+              <Text
+                style={styles.description}
+                numberOfLines={3}
+              >
                 {vespa.konten}
               </Text>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate('VespaDetail', { jenisMotor: vespa.jenis_motor })}
+              >
+                <Text style={styles.readMore}>
+                  Baca selengkapnya →
+                </Text>
+              </TouchableOpacity>
 
               {/* FITUR UNGGULAN */}
               <Text style={styles.featureTitle}>Fitur Unggulan</Text>
@@ -199,7 +213,6 @@ const VespaPediaScreen = () => {
           </View>
         )}
       </ScrollView>
-
     </View>
   );
 };
@@ -299,11 +312,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
     zIndex: 10,
   },
-  vespaYear: {
-    fontSize: 13,
-    color: '#ccc',
-    marginTop: 2,
-  },
   infoRow: {
     flexDirection: 'row',
     marginTop: 10,
@@ -326,6 +334,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: SUBTEXT,
     lineHeight: 20,
+    marginBottom: 4,
+    textAlign: 'justify',   // ✅ rata kanan kiri
+  },
+  readMore: {
+    fontSize: 12,
+    color: PRIMARY,
+    fontWeight: '600',
     marginBottom: 12,
   },
   featureTitle: {

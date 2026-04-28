@@ -227,11 +227,12 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     description: {
-        fontSize: 14,
-        color: SUBTEXT,
-        lineHeight: 22,
-        marginBottom: 10,
-    },
+    fontSize: 14,
+    color: SUBTEXT,
+    lineHeight: 22,
+    marginBottom: 10,
+    textAlign: 'justify', 
+},
     specCard: {
         backgroundColor: CARD,
         padding: 16,
