@@ -45,7 +45,7 @@ const RegisterScreen = () => {
     noHp: '',
     password: '',
     confirmPassword: '',
-    jenisMontor: '',
+    jenisMotor: '',
   });
 
   // State untuk toggle visibility password
@@ -119,7 +119,7 @@ const RegisterScreen = () => {
     }
 
     // Validasi Jenis Motor
-    if (!formData.jenisMontor) {
+    if (!formData.jenisMotor) {
       showModal('error', 'Jenis Motor Wajib Dipilih', 'Pilih salah satu jenis Vespa.');
       return;
     }
@@ -159,7 +159,7 @@ const RegisterScreen = () => {
         email: formData.email,
         no_hp: formData.noHp,
         password: formData.password,
-        jenis_montor: formData.jenisMontor,
+        jenis_motor: formData.jenisMotor,
       });
 
       // Tampilkan pesan sukses dengan instruksi verifikasi email
@@ -176,7 +176,7 @@ const RegisterScreen = () => {
         noHp: '',
         password: '',
         confirmPassword: '',
-        jenisMontor: '',
+        jenisMotor: '',
       });
     } catch (error: any) {
       let message = 'Registrasi gagal.';
@@ -199,7 +199,7 @@ const RegisterScreen = () => {
 
   // Fungsi memilih jenis motor dari modal
   const selectMotor = (value: string) => {
-    setFormData({ ...formData, jenisMontor: value });
+    setFormData({ ...formData, jenisMotor: value });
     setMotorModalVisible(false);
   };
 
@@ -271,7 +271,7 @@ const RegisterScreen = () => {
           onPress={() => setMotorModalVisible(true)}
         >
           <Text style={styles.pickerText}>
-            {formData.jenisMontor || 'Pilih Jenis Motor'}
+            {formData.jenisMotor || 'Pilih Jenis Motor'}
           </Text>
           <MaterialCommunityIcons name="chevron-down" size={24} color={GOLD} />
         </TouchableOpacity>
@@ -293,7 +293,7 @@ const RegisterScreen = () => {
                   <TouchableOpacity
                     style={[
                       styles.modalItem,
-                      formData.jenisMontor === item.value && { backgroundColor: '#EEF6FF', borderRadius: 12, borderWidth: 1, borderColor: GOLD },
+                      formData.jenisMotor === item.value && { backgroundColor: '#EEF6FF', borderRadius: 12, borderWidth: 1, borderColor: GOLD },
                     ]}
                     onPress={() => selectMotor(item.value)}
                   >

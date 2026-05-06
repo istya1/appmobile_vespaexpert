@@ -197,7 +197,7 @@ const ProfileScreen = () => {
         {/* ── HEADER (sama pola DashboardScreen) ─────────────────────────── */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.title}>VESPA EXPERT</Text>
+            <Text style={styles.title}>VESPA MATIC EXPERT</Text>
             <Text style={styles.subtitle}>Profil Pengguna</Text>
           </View>
           <TouchableOpacity onPress={() => setEditMode(!editMode)}>

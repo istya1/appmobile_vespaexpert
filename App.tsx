@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import SplashScreen from './src/screens/splash';
+// import SplashScreen from './src/screens/splash';
 import AppNavigator from './src/navigation/app-navigator';
 
 

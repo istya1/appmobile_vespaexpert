@@ -4,11 +4,11 @@
     "slug": "vespaexpert",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logonw.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/logonw.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,7 +20,7 @@
      "googleServicesFile": "./google-services.json",
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logonw.png",
+        "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -28,7 +28,7 @@
       "package": "com.istyaa1.vespaexpert"
     },
     "web": {
-      "favicon": "./assets/logonw.png",
+      "favicon": "./assets/logo.png",
       "bundler": "metro"
     },
     "plugins": [
