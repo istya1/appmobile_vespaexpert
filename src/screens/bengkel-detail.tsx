@@ -39,7 +39,7 @@ interface BengkelData {
   telepon: string;
   situs?: string;
   jam_operasional: string;
-  tentang: string;
+  deskripsi: string;
   gambar_url?: string;
   latitude: number;
   longitude: number;
@@ -158,7 +158,7 @@ export default function BengkelDetailScreen() {
       {/* Tentang Bengkel */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tentang Bengkel</Text>
-        <Text style={styles.sectionText}>{bengkel.tentang}</Text>
+       <Text style={styles.sectionText}>{bengkel.deskripsi}</Text>
       </View>
 
       {/* Layanan (bisa dibuat dinamis nanti) */}
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: TEXT,
+    color: '#000000',
     marginBottom: 12,
   },
   sectionText: {

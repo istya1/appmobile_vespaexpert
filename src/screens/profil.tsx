@@ -24,13 +24,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 
 // ── Design tokens (sama dengan DashboardScreen) ──────────────────────────────
-const PRIMARY   = '#4A90E2';
-const BG        = '#FFFFFF';
-const CARD      = '#F9FAFB';
+const PRIMARY = '#4A90E2';
+const BG = '#FFFFFF';
+const CARD = '#F9FAFB';
 const TEXT_MAIN = '#111827';
-const TEXT_SUB  = '#6B7280';
-const BORDER    = '#E5E7EB';
-const DANGER    = '#EF4444';
+const TEXT_SUB = '#6B7280';
+const BORDER = '#E5E7EB';
+const DANGER = '#EF4444';
 
 const BASE_URL = 'https://appraiser-pasty-helpline.ngrok-free.dev';
 
@@ -39,27 +39,27 @@ const MOTOR_OPTIONS: Array<{
   value: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
 }> = [
-  { label: 'Primavera 150',   value: 'Primavera 150',   icon: 'scooter' },
-  { label: 'Primavera S 150', value: 'Primavera S 150', icon: 'scooter' },
-  { label: 'LX 125',          value: 'LX 125',          icon: 'scooter' },
-  { label: 'Sprint 150',      value: 'Sprint 150',      icon: 'scooter' },
-  { label: 'Sprint S 150',    value: 'Sprint S 150',    icon: 'scooter' },
-];
+    { label: 'Primavera 150', value: 'Primavera 150', icon: 'scooter' },
+    { label: 'Primavera S 150', value: 'Primavera S 150', icon: 'scooter' },
+    { label: 'LX 125', value: 'LX 125', icon: 'scooter' },
+    { label: 'Sprint 150', value: 'Sprint 150', icon: 'scooter' },
+    { label: 'Sprint S 150', value: 'Sprint S 150', icon: 'scooter' },
+  ];
 
 const ProfileScreen = () => {
-  const [user, setUser]                   = useState<any>(null);
-  const [editMode, setEditMode]           = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({
     nama: '', no_hp: '', alamat: '', jenis_motor: '',
     oldPassword: '', newPassword: '', confirmNewPassword: '',
   });
-  const [motorModalVisible,   setMotorModalVisible]   = useState(false);
-  const [logoutModalVisible,  setLogoutModalVisible]  = useState(false);
-  const [loading,  setLoading]  = useState(false);
-  const [saving,   setSaving]   = useState(false);
+  const [motorModalVisible, setMotorModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const navigation = useNavigation<any>();
-  const [showOldPassword,     setShowOldPassword]     = useState(false);
-  const [showNewPassword,     setShowNewPassword]     = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
@@ -96,10 +96,10 @@ const ProfileScreen = () => {
         const parsed = JSON.parse(stored);
         setUser(parsed);
         setForm({
-          nama:             parsed.nama       || '',
-          no_hp:            parsed.no_hp      || '',
-          alamat:           parsed.alamat     || '',
-          jenis_motor:      parsed.jenis_motor || '',
+          nama: parsed.nama || '',
+          no_hp: parsed.no_hp || '',
+          alamat: parsed.alamat || '',
+          jenis_motor: parsed.jenis_motor || '',
           oldPassword: '', newPassword: '', confirmNewPassword: '',
         });
       }
@@ -165,12 +165,12 @@ const ProfileScreen = () => {
     } finally { setSaving(false); }
   };
 
-  const handleLogout  = () => setLogoutModalVisible(true);
+  const handleLogout = () => setLogoutModalVisible(true);
 
   const confirmLogout = async () => {
     setLogoutModalVisible(false);
     try {
-      await AuthService.logout().catch(() => {});
+      await AuthService.logout().catch(() => { });
       await AsyncStorage.multiRemove(['token', 'user']);
       delete api.defaults.headers.common['Authorization'];
       showModal('success', 'Logout Berhasil', 'Anda telah keluar dari akun.');
@@ -323,9 +323,9 @@ const ProfileScreen = () => {
             <Text style={styles.sectionTitle}>Ganti Password</Text>
 
             {[
-              { key: 'oldPassword',         label: 'Password Lama',             show: showOldPassword,     toggle: setShowOldPassword },
-              { key: 'newPassword',          label: 'Password Baru',             show: showNewPassword,     toggle: setShowNewPassword },
-              { key: 'confirmNewPassword',   label: 'Konfirmasi Password Baru',  show: showConfirmPassword, toggle: setShowConfirmPassword },
+              { key: 'oldPassword', label: 'Password Lama', show: showOldPassword, toggle: setShowOldPassword },
+              { key: 'newPassword', label: 'Password Baru', show: showNewPassword, toggle: setShowNewPassword },
+              { key: 'confirmNewPassword', label: 'Konfirmasi Password Baru', show: showConfirmPassword, toggle: setShowConfirmPassword },
             ].map(({ key, label, show, toggle }) => (
               <View key={key} style={styles.passwordContainer}>
                 <TextInput
@@ -345,17 +345,37 @@ const ProfileScreen = () => {
         )}
 
         {/* ── TOMBOL SIMPAN ────────────────────────────────────────────────── */}
+        {/* ── TOMBOL SIMPAN & BATAL ─────────────────────────────────────────── */}
         {editMode && (
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSave}
-            disabled={saving || loading}
-          >
-            {saving
-              ? <ActivityIndicator size="small" color="#fff" />
-              : <Text style={styles.saveText}>Simpan Perubahan</Text>
-            }
-          </TouchableOpacity>
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => {
+                setEditMode(false);
+                setForm({
+                  nama: user?.nama || '',
+                  no_hp: user?.no_hp || '',
+                  alamat: user?.alamat || '',
+                  jenis_motor: user?.jenis_motor || '',
+                  oldPassword: '', newPassword: '', confirmNewPassword: '',
+                });
+              }}
+              disabled={saving || loading}
+            >
+              <Text style={styles.cancelText}>Batal</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSave}
+              disabled={saving || loading}
+            >
+              {saving
+                ? <ActivityIndicator size="small" color="#fff" />
+                : <Text style={styles.saveText}>Simpan</Text>
+              }
+            </TouchableOpacity>
+          </View>
         )}
 
         {/* ── LOGOUT ───────────────────────────────────────────────────────── */}
@@ -657,13 +677,32 @@ const styles = StyleSheet.create({
   eyeIcon: { position: 'absolute', right: 12, top: 26 },
 
   // Buttons
-  saveButton: {
-    backgroundColor: PRIMARY,
+  actionRow: {
+    flexDirection: 'row',
     marginHorizontal: 20,
+    marginBottom: 12,
+    gap: 10,
+  },
+  cancelButton: {
+    flex: 1,
     padding: 15,
     borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 12,
+    borderWidth: 1.5,
+    borderColor: BORDER,
+    backgroundColor: CARD,
+  },
+  cancelText: {
+    fontWeight: '600',
+    color: TEXT_MAIN,
+    fontSize: 15,
+  },
+ saveButton: {
+  flex: 1,                  // ← tambah flex: 1
+  backgroundColor: PRIMARY,
+  padding: 15,
+  borderRadius: 20,
+  alignItems: 'center',
   },
   saveText: {
     fontWeight: '700',

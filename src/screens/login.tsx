@@ -213,7 +213,7 @@ const LoginScreen = () => {
         {/* Logo Aplikasi */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/logonw.png')}
+            source={require('../../assets/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   logo: {
     width: 200,
@@ -398,8 +398,8 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: 'BORDER_COLOR',
-    backgroundColor: 'INPUT_BG',
+    borderColor: BORDER_COLOR,
+    backgroundColor: INPUT_BG,
     borderRadius: 20,
     paddingHorizontal: 18,
     paddingVertical: 16,

@@ -194,6 +194,8 @@ const styles = StyleSheet.create({
   },
   loadingText: { color: '#999', marginTop: 10, fontSize: 14 },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 30,
     paddingBottom: 16,

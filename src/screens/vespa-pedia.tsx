@@ -81,22 +81,22 @@ const VespaPediaScreen = () => {
   };
 
   const extractFeatures = (konten: string) => {
-  const features = [];
+    const features = [];
 
-  if (konten.toLowerCase().includes('abs')) features.push('Sistem Rem ABS');
-  if (konten.toLowerCase().includes('led')) features.push('Lampu LED');
-  if (konten.toLowerCase().includes('smart')) features.push('Kunci Pintar (Smart Key)');
-  if (
-    konten.toLowerCase().includes('usb') ||
-    konten.toLowerCase().includes('charging')
-  ) features.push('Pengisian USB');
-  if (
-    konten.toLowerCase().includes('injeksi') ||
-    konten.toLowerCase().includes('efi')
-  ) features.push('Sistem Injeksi');
+    if (konten.toLowerCase().includes('abs')) features.push('Sistem Rem ABS');
+    if (konten.toLowerCase().includes('led')) features.push('Lampu LED');
+    if (konten.toLowerCase().includes('smart')) features.push('Kunci Pintar (Smart Key)');
+    if (
+      konten.toLowerCase().includes('usb') ||
+      konten.toLowerCase().includes('charging')
+    ) features.push('Pengisian USB');
+    if (
+      konten.toLowerCase().includes('injeksi') ||
+      konten.toLowerCase().includes('efi')
+    ) features.push('Sistem Injeksi');
 
-  return features.length > 0 ? features : ['Fitur Standar'];
-};
+    return features.length > 0 ? features : ['Fitur Standar'];
+  };
 
   if (loading) {
     return (
@@ -114,8 +114,10 @@ const VespaPediaScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={PRIMARY} />
         </TouchableOpacity>
-        <Text style={styles.title}>VESPA PEDIA</Text>
-        <Text style={styles.subtitle}>Informasi tentang tipe vespa</Text>
+        <View style={{ marginLeft: 12 }}>
+          <Text style={styles.title}>VESPA PEDIA</Text>
+          <Text style={styles.subtitle}>Informasi tentang tipe vespa</Text>
+        </View>
       </View>
 
       {/* SEARCH BAR */}
@@ -236,10 +238,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 20,
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 20,
+  paddingTop: 30,
+  paddingBottom: 20,
+},
   title: {
     fontSize: 24,
     fontWeight: '700',

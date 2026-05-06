@@ -13,9 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.istyaa1.vespaexpert"
     },
     "android": {
+     "googleServicesFile": "./google-services.json",
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/logonw.png",
@@ -23,7 +25,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.vespaexpert"
+      "package": "com.istyaa1.vespaexpert"
     },
     "web": {
       "favicon": "./assets/logonw.png",
@@ -32,6 +34,12 @@
     "plugins": [
       "@react-native-community/datetimepicker",
       "expo-build-properties"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cd1d17a5-fed1-4e11-8bea-bfa6b4dfc95e"
+      }
+    },
+    "owner": "istyaa1"
   }
 }

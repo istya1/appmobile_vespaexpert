@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "102796361478",
+    "project_id": "vespa-expert",
+    "storage_bucket": "vespa-expert.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102796361478:android:143d8a35e2b12a74f42887",
+        "android_client_info": {
+          "package_name": "com.istyaa1.vespaexpert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJsOlN6oq96a9xc_fTAWlKgCgEwDpuwNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102796361478:android:87ea4da7ae935afcf42887",
+        "android_client_info": {
+          "package_name": "com.istyaa1.vespasmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJsOlN6oq96a9xc_fTAWlKgCgEwDpuwNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102796361478:android:5a499648870117c4f42887",
+        "android_client_info": {
+          "package_name": "com.vespaexpert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJsOlN6oq96a9xc_fTAWlKgCgEwDpuwNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

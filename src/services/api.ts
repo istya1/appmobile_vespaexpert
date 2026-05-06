@@ -262,3 +262,37 @@ export const hapusRiwayatDiagnosis = async (id: string | number): Promise<any> =
     throw error;
   }
 };
+
+export interface DataServis {
+  id:                        number;
+  estimasi_km_sekarang:      number;
+  km_target_oli:             number;
+  sisa_km:                   number;
+  sisa_hari:                 number;
+  estimasi_tanggal_deadline: string;
+  status_kondisi:            'aman' | 'segera' | 'kritis' | 'selesai'; // ← union type, bukan string
+  sudah_ganti_oli:           boolean;
+}
+
+export interface PayloadServis {
+  kendaraan_id:          number;
+  km_sekarang:           number;
+  rata_rata_km_per_hari: number;
+  interval_ganti_oli?:   number;
+  expo_push_token?:      string;
+}
+
+// ← Wajib: export const servisApi
+export const servisApi = {
+  simpanData: (payload: PayloadServis) =>
+    api.post<{ berhasil: boolean; data: DataServis }>('/servis', payload),
+
+  getDetail: (kendaraanId: number) =>
+    api.get<{ berhasil: boolean; data: DataServis }>(`/servis/${kendaraanId}`),
+
+  getRiwayat: (kendaraanId: number) =>
+    api.get(`/servis/${kendaraanId}/riwayat`),
+
+  konfirmasiGantiOli: (servisId: number) =>
+    api.patch(`/servis/${servisId}/konfirmasi`),
+};

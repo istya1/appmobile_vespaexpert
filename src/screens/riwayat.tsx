@@ -24,12 +24,12 @@ export default function RiwayatScreen() {
       {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={TEXT} />
+          <Ionicons name="arrow-back" size={24} color={PRIMARY} />
         </TouchableOpacity>
 
         <View style={{ marginLeft: 12 }}>
           <Text style={styles.title}>Riwayat</Text>
-          <Text style={styles.subtitle}>Histori Diagnosa & Servis</Text>
+          <Text style={styles.subtitle}>Histori Diagnosa & Ganti Oli</Text>
         </View>
       </View>
 
@@ -59,7 +59,7 @@ export default function RiwayatScreen() {
               tab === "service" && styles.tabTextActive,
             ]}
           >
-            Servis
+            Ganti Oli
           </Text>
         </TouchableOpacity>
       </View>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   header: {
   flexDirection: "row",
   alignItems: "center",
-  paddingTop: 30,
+  paddingTop: 20,
   paddingHorizontal: 16,
   paddingBottom: 16,
   backgroundColor: CARD,

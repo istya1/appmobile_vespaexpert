@@ -71,7 +71,7 @@ const VespaDetailScreen = () => {
             {/* HEADER */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <MaterialCommunityIcons name="arrow-left" size={24} color={TEXT} />
+                    <MaterialCommunityIcons name="arrow-left" size={24} color={PRIMARY} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Detail Vespa</Text>
                 <View style={{ width: 24 }} />
@@ -175,10 +175,9 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 30,
+        paddingTop: 20,
         paddingBottom: 15,
         backgroundColor: CARD,
         borderBottomColor: BORDER,
@@ -189,6 +188,7 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: 8,
     },
     headerTitle: {
         fontSize: 18,
@@ -227,12 +227,12 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     description: {
-    fontSize: 14,
-    color: SUBTEXT,
-    lineHeight: 22,
-    marginBottom: 10,
-    textAlign: 'justify', 
-},
+        fontSize: 14,
+        color: SUBTEXT,
+        lineHeight: 22,
+        marginBottom: 10,
+        textAlign: 'justify',
+    },
     specCard: {
         backgroundColor: CARD,
         padding: 16,

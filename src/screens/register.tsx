@@ -213,7 +213,7 @@ const RegisterScreen = () => {
         {/* Logo Aplikasi */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/logonw.png')}
+            source={require('../../assets/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -471,8 +471,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 40,
   },
-  logoContainer: { alignItems: 'center', marginBottom: 30 },
-  logo: { width: 180, height: 180 },
+  logoContainer: { alignItems: 'center', marginBottom: 10 },
+  logo: { width: 200, height: 200 },
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -484,13 +484,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     color: TEXT_SUB,
-    marginBottom: 36,
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
     color: TEXT_MAIN,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   required: { color: GOLD },
   input: {
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 16,
     fontSize: 16,
-    marginBottom: 18,
+    marginBottom: 10,
     color: TEXT_MAIN,
   },
   passwordContainer: {
